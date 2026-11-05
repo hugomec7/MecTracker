@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.3.5
+- Check for updates: a new link at the end of the Help tab checks GitHub right away and tells you if you have the latest version, if there is a new one (the notice shows at the top), or if it could not check.
+
 ## 3.3.4
 - Object Mask: when the mask is in Unassigned Masks but Premiere did not save its motion (Object Mask, or a mask not tracked yet), the panel now says so and tells you to drag the mask into the clip's Opacity.
 - Plugin ID changed from com.mectracker.v2 to com.mectracker. The installers remove the old version automatically. Your language and options go back to the defaults once.

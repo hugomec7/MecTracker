@@ -1516,7 +1516,7 @@ var DICT = {
     idle2: 'Agora selecione o alvo, deixe a agulha onde ele está bem posicionado e clique em Colar.',
     s1: 'Rastrear a máscara', s1hint: 'Selecione o clipe que tem a máscara.',
     track: 'Rastrear Clipe Selecionado', cancel: 'Cancelar',
-    updText: 'Nova versão {0} disponível (você tem a {1})', updNotes: 'Ver novidades', updHide: 'Esconder novidades', updGet: 'Baixar', updNoNotes: 'Sem notas nesta versão.',
+    updText: 'Nova versão {0} disponível (você tem a {1})', updNotes: 'Ver novidades', updHide: 'Esconder novidades', updGet: 'Baixar', updNoNotes: 'Sem notas nesta versão.', updCheck: 'Verificar atualizações', updChecking: 'Verificando…', updLatest: 'Você está na versão mais recente ({0}).', updFound: 'Versão {0} disponível: veja o aviso no topo.', updFail: 'Não consegui verificar agora (sem internet ou ainda sem versões publicadas no GitHub).',
     chipOne: 'Rastreio copiado: "{0}"', chipMany: '{0} rastreios copiados', discard: 'Descartar', optsHide: 'Ocultar opções', optsShow: 'Mostrar opções', sumEvery: 'a cada {0} frame(s)',
     bTrack: 'Rastrear', bTrackAuto: 'Rastrear e Colar', bTrackN: 'Rastrear {0} Clipes', bTrackAutoN: 'Rastrear e Colar {0} Clipes', bPasteN: 'Colar em {0} Clipes',
     manyDone: '{0} clipes rastreados. Agora selecione os alvos e clique em Colar.', manyDoneSkip: '{0} de {1} clipes rastreados ({2} com erro, veja o Registro na Ajuda). Agora selecione os alvos e clique em Colar.',
@@ -1566,7 +1566,7 @@ var DICT = {
     idle2: 'Now select the target, park the playhead where it is placed correctly and click Paste.',
     s1: 'Track the mask', s1hint: 'Select the clip that has the mask.',
     track: 'Track Selected Clip', cancel: 'Cancel',
-    updText: 'New version {0} available (you have {1})', updNotes: "What's new", updHide: 'Hide notes', updGet: 'Download', updNoNotes: 'No notes for this version.',
+    updText: 'New version {0} available (you have {1})', updNotes: "What's new", updHide: 'Hide notes', updGet: 'Download', updNoNotes: 'No notes for this version.', updCheck: 'Check for updates', updChecking: 'Checking…', updLatest: 'You have the latest version ({0}).', updFound: 'Version {0} available: see the notice at the top.', updFail: 'Could not check right now (no internet or no versions published on GitHub yet).',
     chipOne: 'Track copied: "{0}"', chipMany: '{0} tracks copied', discard: 'Discard', optsHide: 'Hide options', optsShow: 'Show options', sumEvery: 'every {0} frame(s)',
     bTrack: 'Track', bTrackAuto: 'Track & Paste', bTrackN: 'Track {0} Clips', bTrackAutoN: 'Track & Paste {0} Clips', bPasteN: 'Paste to {0} Clips',
     manyDone: '{0} clips tracked. Now select the targets and click Paste.', manyDoneSkip: '{0} of {1} clips tracked ({2} failed, see the Log in Help). Now select the targets and click Paste.',
@@ -1608,7 +1608,7 @@ var DICT = {
 
 var LS = { lang: 'mectracker.lang', prefs: 'mectracker.prefs', upd: 'mectracker.update', updSkip: 'mectracker.updateSkip' };
 // aviso de atualização: confere a última release do GitHub (no máximo a cada 6 h; o resultado fica guardado)
-var VERSION = '3.3.4', REPO = 'hugomec7/MecTracker', UPD_EVERY = 6 * 36e5;
+var VERSION = '3.3.5', REPO = 'hugomec7/MecTracker', UPD_EVERY = 6 * 36e5;
 var SCALE = 0.125, SHUTTER = 360; // rastreio em 1/8 da resolução; Shutter Angle sempre 360
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -1940,17 +1940,20 @@ function renderUpdate() {
   $('upd-notes').textContent = upd.notes || tr('updNoNotes');
   $('upd-notes-btn').textContent = tr(has($('upd-notes'), 'hidden') ? 'updNotes' : 'updHide');
 }
-async function checkUpdate() {
-  try { var c = JSON.parse(lsGet(LS.upd) || 'null'); if (c && c.tag) { upd = c; renderUpdate(); } if (c && Date.now() - c.at < UPD_EVERY) return; } catch (e) {}
+// force = botão "Verificar atualizações": ignora o intervalo de 6 h e o "✕" e devolve 'new' | 'latest' | 'fail'
+async function checkUpdate(force) {
+  if (!force) try { var c = JSON.parse(lsGet(LS.upd) || 'null'); if (c && c.tag) { upd = c; renderUpdate(); } if (c && Date.now() - c.at < UPD_EVERY) return; } catch (e) {}
   try {
     var r = await fetch('https://api.github.com/repos/' + REPO + '/releases/latest', { headers: { Accept: 'application/vnd.github+json' } });
-    if (!r.ok) return;
+    if (!r.ok) { log('Atualização: o GitHub respondeu ' + r.status + (r.status === 404 ? ' (ainda não há release publicada)' : '') + '.'); return 'fail'; }
     var j = await r.json();
-    if (!j || !j.tag_name) return;
+    if (!j || !j.tag_name) return 'fail';
     upd = { tag: String(j.tag_name), notes: String(j.body || '').trim(), url: String(j.html_url || ('https://github.com/' + REPO + '/releases/latest')), at: Date.now() };
     lsSet(LS.upd, JSON.stringify(upd));
+    if (force) lsDel(LS.updSkip);
     renderUpdate();
-  } catch (e) { /* sem internet: tenta de novo na próxima vez */ }
+    return newer(upd.tag, myVersion()) ? 'new' : 'latest';
+  } catch (e) { log('Atualização: ' + H.msg(e)); return 'fail'; }
 }
 
 function smoothScroll() {
@@ -1990,6 +1993,11 @@ function init() {
   click('btn-cancel', function () { if (cancelTok) { cancelTok.cancelled = true; setStatus(tr('cancelling'), ''); } });
   click('log-toggle', function () { cls($('log'), 'hidden', !has($('log'), 'hidden')); });
   click('log-clear', function () { logLines = []; showLog(); setTracks([]); renderTrack(); renderCount(); setStatus(''); });
+  click('upd-check', async function () {
+    var m = $('upd-msg'); m.textContent = tr('updChecking');
+    var r = await checkUpdate(true);
+    m.textContent = r === 'new' ? tr('updFound', String(upd.tag).replace(/^v/i, '')) : r === 'latest' ? tr('updLatest', myVersion()) : tr('updFail');
+  });
   click('upd-x', function () { if (upd) lsSet(LS.updSkip, upd.tag); renderUpdate(); });
   click('upd-notes-btn', function () { cls($('upd-notes'), 'hidden', !has($('upd-notes'), 'hidden')); renderUpdate(); });
   click('upd-get', function () { try { uxp.shell.openExternal(upd && upd.url || ('https://github.com/' + REPO + '/releases/latest')); } catch (e) {} });
