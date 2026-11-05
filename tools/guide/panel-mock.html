@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div id="app">
+    <div class="top">
+      <img class="logo" src="logo.png" width="118" height="23">
+      <span class="grow"></span>
+      <div class="lang">
+        <div id="langEN" class="lg">EN</div><div id="langPT" class="lg">PT</div>
+      </div>
+    </div>
+
+    <div id="upd" class="upd hidden">
+      <div class="updrow"><span id="upd-text" class="grow"></span><span id="upd-x" class="x">✕</span></div>
+      <div class="updrow"><span id="upd-notes-btn" class="link" data-i="updNotes"></span><span id="upd-get" class="link" data-i="updGet"></span></div>
+      <div id="upd-notes" class="updnotes copyable hidden"></div>
+    </div>
+
+    <div class="tabs">
+      <div id="tab-main" class="tab on" data-i="tabMain"></div>
+      <div id="tab-help" class="tab" data-i="tabHelp"></div>
+    </div>
+
+    <div id="page-main">
+      <div id="trk-chip" class="trkchip hidden"><span class="dot"></span><span id="trk-chip-text" class="grow"></span><span id="trk-chip-x" class="x" data-i="discard"></span></div>
+      <div id="btn-alt" class="btn hidden"></div>
+      <div id="btn-main" class="btn main"></div>
+      <div id="trk-progress" class="progress hidden"><div id="trk-bar"></div></div>
+      <div id="trk-text" class="count hidden"></div>
+      <div id="btn-cancel" class="btn hidden" data-i="cancel"></div>
+      <div class="check autorow" id="chip-auto"><span class="box"></span><span data-i="auto"></span></div>
+
+      <div id="opts" class="opts hidden">
+        <div class="seg" id="seg-action">
+          <div class="opt on" data-v="follow" data-i="follow"></div>
+          <div class="opt" data-v="stabilize" data-i="stabilize"></div>
+        </div>
+        <div class="optsbar"><span id="opts-sum" class="sum grow"></span><span id="opts-toggle" class="link"></span></div>
+        <div id="opts-more">
+        <div class="checks">
+          <div class="check on" id="chip-pos"><span class="box"></span><span data-i="pos"></span></div>
+          <div class="check" id="chip-rot"><span class="box"></span><span data-i="rot"></span></div>
+          <div class="check" id="chip-scale"><span class="box"></span><span data-i="scale"></span></div>
+        </div>
+        <div class="every">
+          <span class="grow2" data-i="every"></span>
+          <div id="step-minus" class="sbtn">−</div>
+          <b id="step-val">1</b>
+          <div id="step-plus" class="sbtn">+</div>
+          <span class="fr" data-i="frames"></span>
+        </div>
+        <div id="count" class="cnt"></div>
+        </div>
+      </div>
+
+      <div id="status" class="status copyable"></div>
+    </div>
+
+    <div id="page-help" class="help hidden">
+      <div class="hstep"><span class="num">1</span><div><b data-i="h1t"></b><div data-i="h1"></div></div></div>
+      <div class="hstep"><span class="num">2</span><div><b data-i="h2t"></b><div data-i="h2"></div></div></div>
+      <div class="hstep"><span class="num">3</span><div><b data-i="h3t"></b><div data-i="h3"></div></div></div>
+      <div class="hstep"><span class="num">4</span><div><b data-i="h4t"></b><div data-i="h4"></div></div></div>
+      <div class="hstep"><span class="num">5</span><div><b data-i="h5t"></b><div data-i="h5"></div></div></div>
+      <div class="tips"><b data-i="tipsT"></b><div data-i="tips"></div></div>
+      <div class="logbar">
+        <div id="log-toggle" class="link" data-i="log"></div>
+        <span class="grow"></span>
+        <span id="toast" class="toast"></span>
+        <div id="log-copy" class="link" data-i="copy"></div>
+        <div id="log-clear" class="link" data-i="clear"></div>
+      </div>
+      <textarea id="log" class="log hidden" readonly spellcheck="false"></textarea>
+      <div class="foot">
+        <span><span data-i="by"></span> Hugo Mec</span>
+        <span id="yt" class="ytlink">Twitter @hugoeditor_</span>
+      </div>
+      <div id="plugin-ver" class="ver">Mec Tracker v3.3.3</div>
+    </div>
+
+  </div>
+  <script>
+window.SEL=1;
+class VideoClipTrackItem{}
+var seq={getSelection:async()=>({getTrackItems:async()=>Array.from({length:window.SEL},()=>new VideoClipTrackItem())}),getPlayerPosition:async()=>({ticksNumber:0})};
+var ppro={VideoClipTrackItem,Project:{getActiveProject:async()=>({getActiveSequence:async()=>seq})},TickTime:{createWithTicks:x=>x},Constants:{TrackItemType:{CLIP:1}}};
+var uxp={storage:{localFileSystem:{getDataFolder:async()=>{throw 1}}},versions:{plugin:'3.3.3'},shell:{}};
+window.require=function(n){return n==='premierepro'?ppro:n==='uxp'?uxp:{}};
+window.__MT_TEST__={}; window.VC=VideoClipTrackItem;
+localStorage.setItem('mectracker.v2.lang','pt');
+</script><script src="index.js"></script>
+  
+</body>
+</html>
