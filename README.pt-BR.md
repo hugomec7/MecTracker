@@ -43,70 +43,70 @@ Quer o painel mais limpo? Use **Ocultar opções** para recolher Posição/Rota�
 
 ## Tutoriais
 
-Vídeos curtos com zoom e legendas em português e inglês. Clique em um título para abrir.
+Vídeos curtos com zoom e legendas em português e inglês.
 
-<details open>
-<summary><b>1. Abrir o painel</b> · Janela > Plug-ins UXP > Mec Tracker.</summary>
+### 1. Abrir o painel
+Janela > Plug-ins UXP > Mec Tracker.
 
 ![Abrir o painel](docs/tutorials/01-open-the-panel.gif)
 
-</details>
+[▶ Ver em MP4 (melhor qualidade)](docs/tutorials/01-open-the-panel.mp4)
 
-<details>
-<summary><b>2. Fazer a máscara à mão</b> · Máscara de Retângulo ou Caneta no objeto e rastreio para frente com o Premiere.</summary>
+### 2. Fazer a máscara à mão
+Máscara de Retângulo ou Caneta no objeto e rastreio para frente com o Premiere.
 
 ![Fazer a máscara à mão](docs/tutorials/02-mask-by-hand.gif)
 
-</details>
+[▶ Ver em MP4 (melhor qualidade)](docs/tutorials/02-mask-by-hand.mp4)
 
-<details>
-<summary><b>3. Máscara automática com Object Mask</b> · Clique no objeto e o Premiere faz a máscara. Deixe o Object Mask dentro do Opacity.</summary>
+### 3. Máscara automática com Object Mask
+Clique no objeto e o Premiere faz a máscara. Deixe o Object Mask dentro do Opacity.
 
 ![Máscara automática com Object Mask](docs/tutorials/03-object-mask.gif)
 
-</details>
+[▶ Ver em MP4 (melhor qualidade)](docs/tutorials/03-object-mask.mp4)
 
-<details>
-<summary><b>4. Rastrear e depois Colar</b> · Rastreie o clipe com máscara, selecione o alvo e clique em Colar.</summary>
+### 4. Rastrear e depois Colar
+Rastreie o clipe com máscara, selecione o alvo e clique em Colar.
 
 ![Rastrear e depois Colar](docs/tutorials/04-track-and-paste.gif)
 
-</details>
+[▶ Ver em MP4 (melhor qualidade)](docs/tutorials/04-track-and-paste.mp4)
 
-<details>
-<summary><b>5. Colar Direto no Clipe de Cima</b> · Um clique rastreia e cola no clipe da trilha de cima.</summary>
+### 5. Colar Direto no Clipe de Cima
+Um clique rastreia e cola no clipe da trilha de cima.
 
 ![Colar Direto no Clipe de Cima](docs/tutorials/05-paste-straight.gif)
 
-</details>
+[▶ Ver em MP4 (melhor qualidade)](docs/tutorials/05-paste-straight.mp4)
 
-<details>
-<summary><b>6. Máscara, Nest e Colar Direto</b> · Faça Nest do gráfico para ele mover junto e use Rastrear e Colar.</summary>
+### 6. Máscara, Nest e Colar Direto
+Faça Nest do gráfico para ele mover junto e use Rastrear e Colar.
 
 ![Máscara, Nest e Colar Direto](docs/tutorials/06-mask-nest-paste-straight.gif)
 
-</details>
+[▶ Ver em MP4 (melhor qualidade)](docs/tutorials/06-mask-nest-paste-straight.mp4)
 
-<details>
-<summary><b>7. Vários clipes: Rastrear e Colar</b> · Rastreie 5 clipes de uma vez e cole em 5 alvos.</summary>
+### 7. Vários clipes: Rastrear e Colar
+Rastreie 5 clipes de uma vez e cole em 5 alvos.
 
 ![Vários clipes: Rastrear e Colar](docs/tutorials/07-several-clips-track-paste.gif)
 
-</details>
+[▶ Ver em MP4 (melhor qualidade)](docs/tutorials/07-several-clips-track-paste.mp4)
 
-<details>
-<summary><b>8. Vários clipes: Colar Direto</b> · Rastrear e Colar em 5 clipes, um por vez, nos clipes de cima.</summary>
+### 8. Vários clipes: Colar Direto
+Rastrear e Colar em 5 clipes, um por vez, nos clipes de cima.
 
 ![Vários clipes: Colar Direto](docs/tutorials/08-several-clips-paste-straight.gif)
 
-</details>
+[▶ Ver em MP4 (melhor qualidade)](docs/tutorials/08-several-clips-paste-straight.mp4)
 
-<details>
-<summary><b>9. Estabilizar um vídeo</b> · Rastreie um ponto (o rosto) e cole com Estabilizar no mesmo clipe.</summary>
+### 9. Estabilizar um vídeo
+Rastreie um ponto (o rosto) e cole com Estabilizar no mesmo clipe.
 
 ![Estabilizar um vídeo](docs/tutorials/09-stabilize.gif)
 
-</details>
+[▶ Ver em MP4 (melhor qualidade)](docs/tutorials/09-stabilize.mp4)
 
 Os mesmos vídeos, em MP4, vêm na pasta **Tutoriais** do [download](../../releases/latest).
 ## Instalar
