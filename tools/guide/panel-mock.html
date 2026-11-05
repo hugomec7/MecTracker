@@ -67,6 +67,7 @@
       <div class="hstep"><span class="num">4</span><div><b data-i="h4t"></b><div data-i="h4"></div></div></div>
       <div class="hstep"><span class="num">5</span><div><b data-i="h5t"></b><div data-i="h5"></div></div></div>
       <div class="tips"><b data-i="tipsT"></b><div data-i="tips"></div></div>
+      <div class="tips"><b data-i="tutT"></b><div data-i="tut"></div><div class="tutbar"><span id="tut-open" class="link" data-i="tutOpen"></span></div></div>
       <div class="logbar">
         <div id="log-toggle" class="link" data-i="log"></div>
         <span class="grow"></span>
@@ -79,7 +80,7 @@
         <span><span data-i="by"></span> Hugo Mec</span>
         <span id="yt" class="ytlink">Twitter @hugoeditor_</span>
       </div>
-      <div id="plugin-ver" class="ver">Mec Tracker v3.3.5</div>
+      <div id="plugin-ver" class="ver">Mec Tracker v3.3.6</div>
     </div>
 
   </div>
@@ -88,7 +89,7 @@ window.SEL=1;
 class VideoClipTrackItem{}
 var seq={getSelection:async()=>({getTrackItems:async()=>Array.from({length:window.SEL},()=>new VideoClipTrackItem())}),getPlayerPosition:async()=>({ticksNumber:0})};
 var ppro={VideoClipTrackItem,Project:{getActiveProject:async()=>({getActiveSequence:async()=>seq})},TickTime:{createWithTicks:x=>x},Constants:{TrackItemType:{CLIP:1}}};
-var uxp={storage:{localFileSystem:{getDataFolder:async()=>{throw 1}}},versions:{plugin:'3.3.5'},shell:{}};
+var uxp={storage:{localFileSystem:{getDataFolder:async()=>{throw 1}}},versions:{plugin:'3.3.6'},shell:{}};
 window.require=function(n){return n==='premierepro'?ppro:n==='uxp'?uxp:{}};
 window.__MT_TEST__={}; window.VC=VideoClipTrackItem;
 localStorage.setItem('mectracker.lang','pt');

@@ -1511,6 +1511,7 @@ var DICT = {
     h3t: 'Escolha o Alvo', h3: 'Selecione o texto, imagem ou gráfico que deve seguir o objeto (pode ser mais de um). Deixe a agulha da timeline no ponto em que ele já está bem posicionado.',
     h4t: 'Ajuste', h4: '<b>Seguir</b>: o alvo acompanha o objeto.<br><b>Estabilizar</b>: o alvo faz o contrário, para deixar o objeto parado. Marque o que quer copiar: Posição, Rotação e/ou Escala.',
     h5t: 'Cole', h5: 'Aperte <b>Colar</b>. O Mec Tracker cria o efeito Transform com os keyframes sozinho. Se você rastreou vários clipes, cada alvo recebe o rastreio do clipe com que ele mais coincide no tempo.',
+    tutT: 'Tutoriais em vídeo', tut: 'Vídeos curtos de cada passo: abrir o painel, fazer a máscara (à mão ou com Object Mask), Rastrear e Colar, Colar Direto, vários clipes e Estabilizar. Os vídeos também vêm na pasta <b>Tutoriais</b> do download.', tutOpen: 'Ver os tutoriais',
     tipsT: 'Dicas', tips: '• O botão azul é sempre o próximo passo.<br>• Depois de rastrear, a faixa verde em cima mostra o rastreio copiado. <b>Descartar</b> apaga ele.<br>• <b>Ocultar opções</b> recolhe Posição, Rotação, Escala e o intervalo, e deixa só um resumo.<br>• Um keyframe a cada 1 frame é o mais fiel. Números maiores deixam o movimento mais suave, com menos keyframes.<br>• Se a máscara estiver em Unassigned Masks, salve o projeto (Ctrl+S) antes de rastrear. Máscaras do <b>Object Mask</b> precisam ficar dentro do Opacity.<br>• <b>Colar Direto no Clipe de Cima</b>: o botão vira <b>Rastrear e Colar</b> e o plugin já cola os keyframes no clipe da trilha logo acima (por exemplo, o texto em cima do vídeo). Com vários clipes selecionados, ele faz isso com cada um, um por vez, usando o primeiro quadro de cada clipe como referência.<br>• Algo deu errado? Abra o Registro abaixo, clique em Copiar e envie para o Hugo.',
     idle: 'Selecione o clipe que tem a máscara (ou vários) e clique em Rastrear.',
     idle2: 'Agora selecione o alvo, deixe a agulha onde ele está bem posicionado e clique em Colar.',
@@ -1561,6 +1562,7 @@ var DICT = {
     h3t: 'Pick The Target', h3: 'Select the text, image or graphic that should follow the object (it can be more than one). Park the timeline playhead where it is already placed correctly.',
     h4t: 'Adjust', h4: '<b>Follow</b>: the target follows the object.<br><b>Stabilize</b>: the target does the opposite, to hold the object still. Tick what to copy: Position, Rotation and/or Scale.',
     h5t: 'Paste', h5: 'Press <b>Paste</b>. Mec Tracker creates the Transform effect with the keyframes for you. If you tracked several clips, each target gets the track of the clip it overlaps most in time.',
+    tutT: 'Video tutorials', tut: 'Short videos for each step: opening the panel, making the mask (by hand or with Object Mask), Track and Paste, Paste Straight, several clips and Stabilize. The videos also come in the <b>Tutoriais</b> folder of the download.', tutOpen: 'Watch the tutorials',
     tipsT: 'Tips', tips: '• The blue button is always the next step.<br>• After tracking, the green strip on top shows the copied track. <b>Discard</b> clears it.<br>• <b>Hide options</b> folds Position, Rotation, Scale and the interval, leaving just a summary.<br>• One keyframe every 1 frame is the most accurate. Higher numbers give smoother motion with fewer keyframes.<br>• If the mask is in Unassigned Masks, save the project (Ctrl+S) before tracking. <b>Object Mask</b> masks must be inside Opacity.<br>• <b>Paste Straight to Clip Above</b>: the button becomes <b>Track &amp; Paste</b> and the plugin pastes the keyframes onto the clip on the track right above (for example, the text over the video). With several clips selected, it does that for each one, one at a time, using each clip\'s first frame as the reference.<br>• Something went wrong? Open the Log below, click Copy and send it to Hugo.',
     idle: 'Select the clip that has the mask (or several) and click Track.',
     idle2: 'Now select the target, park the playhead where it is placed correctly and click Paste.',
@@ -1608,7 +1610,7 @@ var DICT = {
 
 var LS = { lang: 'mectracker.lang', prefs: 'mectracker.prefs', upd: 'mectracker.update', updSkip: 'mectracker.updateSkip' };
 // aviso de atualização: confere a última release do GitHub (no máximo a cada 30 min; o resultado fica guardado)
-var VERSION = '3.3.5', REPO = 'hugomec7/MecTracker', UPD_EVERY = 30 * 6e4;
+var VERSION = '3.3.6', REPO = 'hugomec7/MecTracker', UPD_EVERY = 30 * 6e4;
 var SCALE = 0.125, SHUTTER = 360; // rastreio em 1/8 da resolução; Shutter Angle sempre 360
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -2006,6 +2008,7 @@ function init() {
   click('log-copy', function () { copyText(logLines.join('\n')); });
   // clicar em um texto (resultado, aviso, erro) copia ele; o Registro também pode ser selecionado com o mouse
   ['status'].forEach(function (id) { $(id).addEventListener('click', function () { var t = $(id).textContent; if (t) copyText(t); }); });
+  click('tut-open', function () { try { uxp.shell.openExternal('https://github.com/' + REPO + (lang === 'pt' ? '/blob/main/README.pt-BR.md#tutoriais' : '#tutorials')); } catch (e) {} });
   click('yt', function () { try { uxp.shell.openExternal('https://x.com/hugoeditor_'); } catch (e) {} });
   hover();
   refreshPrefs();

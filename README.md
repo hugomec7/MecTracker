@@ -4,6 +4,7 @@
 
 <p align="center">
   <a href="../../releases/latest">Download</a> ·
+  <a href="#tutorials">Video tutorials</a> ·
   <a href="docs/guides/MecTracker-Guide_en-us.pdf">User guide (PDF)</a> ·
   <a href="README.pt-BR.md">🇧🇷 Leia em português</a>
 </p>
@@ -40,6 +41,74 @@ Mec Tracker is a free, open source panel for **Adobe Premiere Pro 2026**. Track 
 
 Want a cleaner panel? Use **Hide options** to fold Position/Rotation/Scale and the interval into a one-line summary. The full step-by-step guide is in [docs/guides](docs/guides/MecTracker-Guide_en-us.pdf), and the same tips are in the panel's **Help** tab.
 
+## Tutorials
+
+Short videos with zoom and captions in English and Portuguese. Click a title to open it.
+
+<details open>
+<summary><b>1. Open the panel</b> · Window > UXP Plugins > Mec Tracker.</summary>
+
+![Open the panel](docs/tutorials/01-open-the-panel.gif)
+
+</details>
+
+<details>
+<summary><b>2. Make a mask by hand</b> · Rectangle or Pen mask on the object, then track it forward with Premiere.</summary>
+
+![Make a mask by hand](docs/tutorials/02-mask-by-hand.gif)
+
+</details>
+
+<details>
+<summary><b>3. Automatic mask with Object Mask</b> · Click the object and Premiere masks it. Keep the Object Mask inside Opacity.</summary>
+
+![Automatic mask with Object Mask](docs/tutorials/03-object-mask.gif)
+
+</details>
+
+<details>
+<summary><b>4. Track, then Paste</b> · Track the masked clip, select the target and click Paste.</summary>
+
+![Track, then Paste](docs/tutorials/04-track-and-paste.gif)
+
+</details>
+
+<details>
+<summary><b>5. Paste Straight to Clip Above</b> · One click tracks and pastes onto the clip on the track above.</summary>
+
+![Paste Straight to Clip Above](docs/tutorials/05-paste-straight.gif)
+
+</details>
+
+<details>
+<summary><b>6. Mask, Nest and Paste Straight</b> · Nest the graphic so it moves as one piece, then Track & Paste.</summary>
+
+![Mask, Nest and Paste Straight](docs/tutorials/06-mask-nest-paste-straight.gif)
+
+</details>
+
+<details>
+<summary><b>7. Several clips: Track and Paste</b> · Track 5 clips at once, then paste onto 5 targets.</summary>
+
+![Several clips: Track and Paste](docs/tutorials/07-several-clips-track-paste.gif)
+
+</details>
+
+<details>
+<summary><b>8. Several clips: Paste Straight</b> · Track & Paste 5 clips, one at a time, onto the clips above.</summary>
+
+![Several clips: Paste Straight](docs/tutorials/08-several-clips-paste-straight.gif)
+
+</details>
+
+<details>
+<summary><b>9. Stabilize a shot</b> · Track a point (the face) and paste with Stabilize on the same clip.</summary>
+
+![Stabilize a shot](docs/tutorials/09-stabilize.gif)
+
+</details>
+
+The same videos, in MP4, come in the **Tutoriais** folder of the [download](../../releases/latest).
 ## Install
 
 1. Download the latest `MecTracker_x.y.z.zip` from [Releases](../../releases/latest) and unzip it.
@@ -55,7 +124,7 @@ Installing a new version is the same: run the installer again. It replaces the o
 
 ![Update notice](docs/images/en/5-update.png)
 
-When a new release is published here, the panel shows the new version number, a **What's new** button with the release notes and a **Download** link. It checks GitHub at most every 6 hours, and only when the panel is open.
+When a new release is published here, the panel shows the new version number, a **What's new** button with the release notes and a **Download** link. It checks GitHub every 30 minutes while the panel is open. To check right away, click **Check for updates** at the end of the Help tab.
 
 ## Requirements and limits
 

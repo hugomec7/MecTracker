@@ -4,6 +4,7 @@
 
 <p align="center">
   <a href="../../releases/latest">Baixar</a> ·
+  <a href="#tutoriais">Tutoriais em vídeo</a> ·
   <a href="docs/guides/MecTracker-Guide_pt-br.pdf">Guia de uso (PDF)</a> ·
   <a href="README.md">🌎 Read in English</a>
 </p>
@@ -40,6 +41,74 @@ O Mec Tracker é um painel gratuito e de código aberto para o **Adobe Premiere 
 
 Quer o painel mais limpo? Use **Ocultar opções** para recolher Posição/Rotação/Escala e o intervalo em um resumo de uma linha. O passo a passo completo está no [guia de uso](docs/guides/MecTracker-Guide_pt-br.pdf), e as mesmas dicas ficam na aba **Ajuda** do painel.
 
+## Tutoriais
+
+Vídeos curtos com zoom e legendas em português e inglês. Clique em um título para abrir.
+
+<details open>
+<summary><b>1. Abrir o painel</b> · Janela > Plug-ins UXP > Mec Tracker.</summary>
+
+![Abrir o painel](docs/tutorials/01-open-the-panel.gif)
+
+</details>
+
+<details>
+<summary><b>2. Fazer a máscara à mão</b> · Máscara de Retângulo ou Caneta no objeto e rastreio para frente com o Premiere.</summary>
+
+![Fazer a máscara à mão](docs/tutorials/02-mask-by-hand.gif)
+
+</details>
+
+<details>
+<summary><b>3. Máscara automática com Object Mask</b> · Clique no objeto e o Premiere faz a máscara. Deixe o Object Mask dentro do Opacity.</summary>
+
+![Máscara automática com Object Mask](docs/tutorials/03-object-mask.gif)
+
+</details>
+
+<details>
+<summary><b>4. Rastrear e depois Colar</b> · Rastreie o clipe com máscara, selecione o alvo e clique em Colar.</summary>
+
+![Rastrear e depois Colar](docs/tutorials/04-track-and-paste.gif)
+
+</details>
+
+<details>
+<summary><b>5. Colar Direto no Clipe de Cima</b> · Um clique rastreia e cola no clipe da trilha de cima.</summary>
+
+![Colar Direto no Clipe de Cima](docs/tutorials/05-paste-straight.gif)
+
+</details>
+
+<details>
+<summary><b>6. Máscara, Nest e Colar Direto</b> · Faça Nest do gráfico para ele mover junto e use Rastrear e Colar.</summary>
+
+![Máscara, Nest e Colar Direto](docs/tutorials/06-mask-nest-paste-straight.gif)
+
+</details>
+
+<details>
+<summary><b>7. Vários clipes: Rastrear e Colar</b> · Rastreie 5 clipes de uma vez e cole em 5 alvos.</summary>
+
+![Vários clipes: Rastrear e Colar](docs/tutorials/07-several-clips-track-paste.gif)
+
+</details>
+
+<details>
+<summary><b>8. Vários clipes: Colar Direto</b> · Rastrear e Colar em 5 clipes, um por vez, nos clipes de cima.</summary>
+
+![Vários clipes: Colar Direto](docs/tutorials/08-several-clips-paste-straight.gif)
+
+</details>
+
+<details>
+<summary><b>9. Estabilizar um vídeo</b> · Rastreie um ponto (o rosto) e cole com Estabilizar no mesmo clipe.</summary>
+
+![Estabilizar um vídeo](docs/tutorials/09-stabilize.gif)
+
+</details>
+
+Os mesmos vídeos, em MP4, vêm na pasta **Tutoriais** do [download](../../releases/latest).
 ## Instalar
 
 1. Baixe o `MecTracker_x.y.z.zip` mais recente em [Releases](../../releases/latest) e extraia.
@@ -55,7 +124,7 @@ Para instalar uma versão nova, é só rodar o instalador de novo. Ele substitui
 
 ![Aviso de atualização](docs/images/pt/5-update.png)
 
-Quando sair uma release nova aqui, o painel mostra o número da versão nova, um botão **Ver novidades** com as notas da versão e um link **Baixar**. Ele confere o GitHub no máximo a cada 6 horas, e só com o painel aberto.
+Quando sair uma release nova aqui, o painel mostra o número da versão nova, um botão **Ver novidades** com as notas da versão e um link **Baixar**. Ele confere o GitHub a cada 30 minutos com o painel aberto. Para conferir na hora, clique em **Verificar atualizações** no fim da aba Ajuda.
 
 ## Requisitos e limites
 

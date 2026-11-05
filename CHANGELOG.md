@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.6
+- Video tutorials: 9 short videos (open the panel, masks, Track and Paste, Paste Straight, several clips, Stabilize). They are in the README and in the Tutoriais folder of the download.
+- Help tab: new Video tutorials section with a link to the videos.
+
 ## 3.3.5
 - Update notice checks GitHub every 30 minutes (it was every 6 hours).
 - Check for updates: a new link at the end of the Help tab checks GitHub right away and tells you if you have the latest version, if there is a new one (the notice shows at the top), or if it could not check.
