@@ -8,6 +8,9 @@
   <a href="README.md">🌎 Read in English</a>
 </p>
 
+> [!IMPORTANT]
+> **Funciona só no Adobe Premiere Pro 2026 (versão 26.0) ou mais novo.** Não funciona no Premiere Pro 2025 nem em versões anteriores.
+
 ![Painel do Mec Tracker](docs/images/pt/hero.png)
 
 O Mec Tracker é um painel gratuito e de código aberto para o **Adobe Premiere Pro 2026**. Você rastreia uma máscara com o tracker do próprio Premiere, e o Mec Tracker transforma esse movimento em keyframes de **Transform** em um texto, imagem, gráfico ou Nest, para ele seguir o objeto. Também dá para fazer o contrário e **estabilizar** o vídeo.

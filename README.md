@@ -8,6 +8,9 @@
   <a href="README.pt-BR.md">🇧🇷 Leia em português</a>
 </p>
 
+> [!IMPORTANT]
+> **Works only in Adobe Premiere Pro 2026 (version 26.0) or later.** It does not work in Premiere Pro 2025 or older.
+
 ![Mec Tracker panel](docs/images/en/hero.png)
 
 Mec Tracker is a free, open source panel for **Adobe Premiere Pro 2026**. Track a mask with Premiere's own tracker. Then let Mec Tracker turn that motion into **Transform** keyframes on a text, image, graphic or Nest, so the target follows the object. It can also do the opposite and **stabilize** the shot.
