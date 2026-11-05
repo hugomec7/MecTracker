@@ -992,7 +992,7 @@ function createHost(ppro, uxp, log) {
           if (isCompletePng(bytes)) { try { entry.delete().catch(function () {}); } catch (e) {} return bytes; }
         } catch (e) {}
       }
-      await sleep(3);
+      await sleep(12);
     }
     throw fail('EXPORT_TIMEOUT');
   }
@@ -1012,7 +1012,7 @@ function createHost(ppro, uxp, log) {
     for (i = 0; i < total; i += stride) want.push(i);
     if (want[want.length - 1] !== total - 1) want.push(total - 1);
     var sc = Math.max(scale, Math.min(1, 96 / Math.max(1, Math.min(size.width, size.height))));
-    var got = [], opaque = 0, t0 = Date.now(), K = mode.seek ? 1 : 4, jobs = {}, next = 0, j, run = Date.now().toString(36);
+    var got = [], opaque = 0, t0 = Date.now(), K = 1, par = !mode.seek, jobs = {}, next = 0, j, run = Date.now().toString(36);
     var fw = Math.max(1, Math.round(size.width * sc)), fh = Math.max(1, Math.round(size.height * sc));
     var tDecode = 0, tMeasure = 0, tWait = 0, cancelled = false;
     var playhead = null;
@@ -1033,10 +1033,10 @@ function createHost(ppro, uxp, log) {
         var bytes, tw = Date.now();
         try { bytes = await jobs[i]; }
         catch (e) {
-          if (K === 1) throw e;
+          if (!par) throw e;
           log('Exportação em paralelo falhou (' + msg(e) + '); voltando ao modo sequencial.');
           for (j = i + 1; j < next; j++) { try { await jobs[j]; } catch (x) {} }
-          K = 1; next = i + 1;
+          K = 1; par = false; next = i + 1;
           bytes = await exportFrame(seq, TT(tm.start + want[i] * frameTicks), fw, fh, 'mectracker_' + run + '_' + want[i] + 'b');
         }
         delete jobs[i];
@@ -1047,6 +1047,8 @@ function createHost(ppro, uxp, log) {
         var m = measure.measure(img);
         tDecode += t2 - t1; tMeasure += Date.now() - t2;
         if (m.coverage > 0.999) opaque++;
+        // 1º quadro com máscara recortando: libera 4 exportações em paralelo; se o clipe sai inteiro (máscara em Unassigned), segue 1 por vez até desistir
+        else if (par && K === 1) { K = 4; while (next < want.length && next < i + 1 + K) issue(next++); }
         if (opaque >= 3 && opaque === i + 1) throw fail('OPAQUE');
         got.push({
           i: want[i], cx: Math.round(m.cx * size.width * 100) / 100, cy: Math.round(m.cy * size.height * 100) / 100,
@@ -1610,7 +1612,7 @@ var DICT = {
 
 var LS = { lang: 'mectracker.lang', prefs: 'mectracker.prefs', upd: 'mectracker.update', updSkip: 'mectracker.updateSkip' };
 // aviso de atualização: confere a última release do GitHub (no máximo a cada 30 min; o resultado fica guardado)
-var VERSION = '3.3.6', REPO = 'hugomec7/MecTracker', UPD_EVERY = 30 * 6e4;
+var VERSION = '3.3.7', REPO = 'hugomec7/MecTracker', UPD_EVERY = 30 * 6e4;
 var SCALE = 0.125, SHUTTER = 360; // rastreio em 1/8 da resolução; Shutter Angle sempre 360
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -1743,6 +1745,7 @@ function setBusy(b) {
 async function run(fn) {
   if (busy) { setStatus(tr('E_BUSY'), 'err'); return; }
   setBusy(true);
+  for (var w = 0; selPolling && w < 50; w++) await new Promise(function (r) { setTimeout(r, 20); });
   try { await fn(); }
   catch (e) { var m = errText(e); setStatus(m, 'err'); log('✗ ' + m + (e && e.stack ? '\n' + String(e.stack).split('\n').slice(0, 3).join('\n') : '')); }
   finally { setBusy(false); }
@@ -2015,7 +2018,12 @@ function init() {
   applyLang();
   setStatus('');
   fileLoad().then(function (p) { if (p) { applyPrefs(p); refreshPrefs(); applyLang(); } });
-  setInterval(pollSelection, 600);
+  // antes: consultava a seleção do Premiere a cada 600 ms, o tempo todo (pesava e podia derrubar o Premiere)
+  var lastPoll = 0;
+  function pollSoon() { if (busy || Date.now() - lastPoll < 700) return; lastPoll = Date.now(); pollSelection(); }
+  $('app').addEventListener('mouseenter', pollSoon);
+  window.addEventListener('focus', pollSoon);
+  pollSoon();
   checkUpdate(); setInterval(checkUpdate, UPD_EVERY);
   log('Mec Tracker ' + ((uxp.versions && uxp.versions.plugin) || '') + ' pronto.');
 }

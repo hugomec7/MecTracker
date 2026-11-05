@@ -80,7 +80,7 @@
         <span><span data-i="by"></span> Hugo Mec</span>
         <span id="yt" class="ytlink">Twitter @hugoeditor_</span>
       </div>
-      <div id="plugin-ver" class="ver">Mec Tracker v3.3.6</div>
+      <div id="plugin-ver" class="ver">Mec Tracker v3.3.7</div>
     </div>
 
   </div>
@@ -89,7 +89,7 @@ window.SEL=1;
 class VideoClipTrackItem{}
 var seq={getSelection:async()=>({getTrackItems:async()=>Array.from({length:window.SEL},()=>new VideoClipTrackItem())}),getPlayerPosition:async()=>({ticksNumber:0})};
 var ppro={VideoClipTrackItem,Project:{getActiveProject:async()=>({getActiveSequence:async()=>seq})},TickTime:{createWithTicks:x=>x},Constants:{TrackItemType:{CLIP:1}}};
-var uxp={storage:{localFileSystem:{getDataFolder:async()=>{throw 1}}},versions:{plugin:'3.3.6'},shell:{}};
+var uxp={storage:{localFileSystem:{getDataFolder:async()=>{throw 1}}},versions:{plugin:'3.3.7'},shell:{}};
 window.require=function(n){return n==='premierepro'?ppro:n==='uxp'?uxp:{}};
 window.__MT_TEST__={}; window.VC=VideoClipTrackItem;
 localStorage.setItem('mectracker.lang','pt');

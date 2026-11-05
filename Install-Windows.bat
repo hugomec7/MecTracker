@@ -25,7 +25,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
  "if (Test-Path $f) { Copy-Item $f ($f+'.bak') -Force; $j = Get-Content $f -Raw | ConvertFrom-Json } else { $j = [pscustomobject]@{ plugins = @() } };" ^
  "if (-not $j.plugins) { $j | Add-Member -NotePropertyName plugins -NotePropertyValue @() -Force };" ^
  "$j.plugins = @($j.plugins | Where-Object { $_.pluginId -ne 'com.mectracker' -and $_.pluginId -ne 'com.mectracker.v2' });" ^
- "$j.plugins += [pscustomobject]@{ hostMinVersion='25.6.0'; name='Mec Tracker'; path='$extension/Plugins/External/com.mectracker'; pluginId='com.mectracker'; status='enabled'; type='uxp'; versionString='3.3.6' };" ^
+ "$j.plugins += [pscustomobject]@{ hostMinVersion='25.6.0'; name='Mec Tracker'; path='$extension/Plugins/External/com.mectracker'; pluginId='com.mectracker'; status='enabled'; type='uxp'; versionString='3.3.7' };" ^
  "$j | ConvertTo-Json -Depth 10 | Set-Content $f -Encoding UTF8"
 echo.
 echo Done. Restart Premiere Pro and go to Window ^> UXP Plugins ^> Mec Tracker
