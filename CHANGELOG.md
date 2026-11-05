@@ -1,6 +1,7 @@
 # Changelog
 
 ## 3.3.5
+- Update notice checks GitHub every 30 minutes (it was every 6 hours).
 - Check for updates: a new link at the end of the Help tab checks GitHub right away and tells you if you have the latest version, if there is a new one (the notice shows at the top), or if it could not check.
 
 ## 3.3.4

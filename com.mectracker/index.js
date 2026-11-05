@@ -1607,8 +1607,8 @@ var DICT = {
 };
 
 var LS = { lang: 'mectracker.lang', prefs: 'mectracker.prefs', upd: 'mectracker.update', updSkip: 'mectracker.updateSkip' };
-// aviso de atualização: confere a última release do GitHub (no máximo a cada 6 h; o resultado fica guardado)
-var VERSION = '3.3.5', REPO = 'hugomec7/MecTracker', UPD_EVERY = 6 * 36e5;
+// aviso de atualização: confere a última release do GitHub (no máximo a cada 30 min; o resultado fica guardado)
+var VERSION = '3.3.5', REPO = 'hugomec7/MecTracker', UPD_EVERY = 30 * 6e4;
 var SCALE = 0.125, SHUTTER = 360; // rastreio em 1/8 da resolução; Shutter Angle sempre 360
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -1940,7 +1940,7 @@ function renderUpdate() {
   $('upd-notes').textContent = upd.notes || tr('updNoNotes');
   $('upd-notes-btn').textContent = tr(has($('upd-notes'), 'hidden') ? 'updNotes' : 'updHide');
 }
-// force = botão "Verificar atualizações": ignora o intervalo de 6 h e o "✕" e devolve 'new' | 'latest' | 'fail'
+// force = botão "Verificar atualizações": ignora o intervalo de 30 min e o "✕" e devolve 'new' | 'latest' | 'fail'
 async function checkUpdate(force) {
   if (!force) try { var c = JSON.parse(lsGet(LS.upd) || 'null'); if (c && c.tag) { upd = c; renderUpdate(); } if (c && Date.now() - c.at < UPD_EVERY) return; } catch (e) {}
   try {
