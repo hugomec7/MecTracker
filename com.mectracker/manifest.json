@@ -1,7 +1,7 @@
 {
-  "id": "com.mectracker.v2",
+  "id": "com.mectracker",
   "name": "Mec Tracker",
-  "version": "3.3.3",
+  "version": "3.3.4",
   "main": "index.html",
   "host": {
     "app": "premierepro",
@@ -25,7 +25,7 @@
   },
   "entrypoints": [
     {
-      "id": "mectracker.v2.panel",
+      "id": "mectracker.panel",
       "type": "panel",
       "label": {
         "default": "Mec Tracker"

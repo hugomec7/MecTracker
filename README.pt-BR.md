@@ -1,4 +1,4 @@
-<p align="center"><img src="com.mectracker.v2/logo.png" height="40" alt="Mec Tracker"></p>
+<p align="center"><img src="com.mectracker/logo.png" height="40" alt="Mec Tracker"></p>
 
 <p align="center"><b>Transforme o tracking de máscara nativo do Premiere Pro em keyframes de Transform, em poucos cliques.</b></p>
 
@@ -47,7 +47,7 @@ Quer o painel mais limpo? Use **Ocultar opções** para recolher Posição/Rota�
    **Mac**: abra o Terminal, digite `bash `, arraste o `Install-Mac.command` para a janela e aperte Enter.
 3. Reinicie o Premiere Pro e abra **Janela > Plug-ins UXP > Mec Tracker**.
 
-Instalação manual (Windows): copie a pasta `com.mectracker.v2` para `C:\Program Files\Common Files\Adobe\UXP\Plugins\External\`.
+Instalação manual (Windows): copie a pasta `com.mectracker` para `C:\Program Files\Common Files\Adobe\UXP\Plugins\External\`.
 
 Para instalar uma versão nova, é só rodar o instalador de novo. Ele substitui a versão antiga.
 
@@ -69,7 +69,7 @@ Abra a aba **Ajuda**, clique em **Registro** e depois em **Copiar**. Em seguida,
 
 ## Para desenvolvedores
 
-O plugin é UXP puro (manifest v5), sem etapa de build: está tudo em [`com.mectracker.v2`](com.mectracker.v2). Para testar mudanças, carregue essa pasta no **UXP Developer Tool**. A pasta `tools/guide` gera de novo os guias em PDF e os prints a partir do painel real.
+O plugin é UXP puro (manifest v5), sem etapa de build: está tudo em [`com.mectracker`](com.mectracker). Para testar mudanças, carregue essa pasta no **UXP Developer Tool**. A pasta `tools/guide` gera de novo os guias em PDF e os prints a partir do painel real.
 
 Ao publicar uma release, atualize a versão no `manifest.json`, no `VERSION` dentro do `index.js`, no fim da aba Ajuda (`plugin-ver` no `index.html`) e nos dois instaladores. Depois crie a tag `vX.Y.Z` para o aviso de atualização encontrar a versão.
 
