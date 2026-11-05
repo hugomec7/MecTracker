@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.3.9
+- Unassigned Masks: when the same clip sits at the same place in more than one sequence (a copy of the sequence, an older version, a Nest), the panel could read the mask of another sequence and the track came out wrong. It now only uses the mask of the clip in the active sequence.
+
 ## 3.3.8
 - Track: the video tracks hidden while tracking now always show again at the end. Before, the panel only restored the tracks that Premiere already reported as hidden, and some stayed hidden.
 - If Premiere or the panel closes in the middle of a track, the panel shows those tracks again the next time it opens (or before the next action).

@@ -621,6 +621,34 @@ function objectSlices(xml) {
 }
 
 /** Trechos do XML que pertencem ao(s) clipe(s) da timeline com este início e fim (ticks). null = não achei o clipe. */
+// clipes (ObjectID de VideoClipTrackItem) que estão na sequência ativa: Sequence -> TrackGroup -> Track -> TrackItem
+// sem isso, um clipe igual em outra sequência (cópia, versão antiga, Nest) com a mesma posição também "era do clipe"
+function sequenceItemIds(xml, guid, name) {
+  var re = /<([A-Za-z_][\w.:-]*)\s[^>]*?\bObject(U?)ID="([^"]+)"[^>]*>/g, list = [], byId = {}, m, i, seqObj = null;
+  while ((m = re.exec(xml))) list.push({ id: m[3], name: m[1], at: m.index, end: 0 });
+  for (i = 0; i < list.length; i++) { list[i].end = i + 1 < list.length ? list[i + 1].at : xml.length; byId[list[i].id] = list[i]; }
+  if (guid && byId[guid] && byId[guid].name === 'Sequence') seqObj = byId[guid];
+  if (!seqObj && name) {
+    // o XML é lido como bytes; nomes com acento aparecem em UTF-8 "cru"
+    var raw = name; try { raw = unescape(encodeURIComponent(name)); } catch (e) {}
+    var hits = list.filter(function (o) { if (o.name !== 'Sequence') return false; var nm = /<Name>([^<]*)<\/Name>/.exec(xml.slice(o.at, o.end)); return nm && (nm[1] === name || nm[1] === raw); });
+    if (hits.length === 1) seqObj = hits[0];
+  }
+  if (!seqObj) return null;
+  var ok = /(TrackGroup|ClipTrack|^VideoClipTrackItem)$/, out = {}, seen = {}, queue = [{ o: seqObj, d: 0 }], n = 0;
+  while (queue.length && n < 5000) {
+    var q = queue.shift(); n++;
+    if (q.o.name === 'VideoClipTrackItem') { out[q.o.id] = true; continue; }
+    if (q.d >= 4) continue;
+    var body = xml.slice(q.o.at, q.o.end), r = /Object(?:U)?Ref="([^"]+)"/g, mm;
+    while ((mm = r.exec(body))) {
+      var t = byId[mm[1]];
+      if (!t || seen[t.id] || !ok.test(t.name)) continue;
+      seen[t.id] = true; queue.push({ o: t, d: q.d + 1 });
+    }
+  }
+  return out;
+}
 function ownedRanges(xml, clip) {
   var re = /<VideoClipTrackItem ObjectID="(\d+)"[^>]*>/g, m, roots = [], objs = null, byId = {}, i;
   while ((m = re.exec(xml))) {
@@ -629,6 +657,13 @@ function ownedRanges(xml, clip) {
     if (em && Number(em[1]) === clip.end && (sm ? Number(sm[1]) : 0) === clip.start) roots.push(m[1]);
   }
   if (!roots.length) return null;
+  if (roots.length > 1 && (clip.seqGuid || clip.seqName)) {
+    var inSeq = null;
+    try { inSeq = sequenceItemIds(xml, clip.seqGuid, clip.seqName); } catch (e) { inSeq = null; }
+    var mine = inSeq ? roots.filter(function (id) { return inSeq[id]; }) : [];
+    if (clip.info) clip.info.sameClips = roots.length;
+    if (mine.length) { roots = mine; if (clip.info) clip.info.seqFiltered = true; }
+  }
   objs = objectSlices(xml);
   for (i = 0; i < objs.length; i++) byId[objs[i].id] = objs[i];
   var skip = /(TrackItem|TrackGroup|Track$|Sequence|Project|Bin|Marker|MasterClip|Media|Stream)/, ranges = [], seen = {}, queue = [], n = 0;
@@ -703,8 +738,10 @@ function buildMasks(tracks) {
 function readMasks(xml, clip) {
   var tracks = findTracks(xml), all = buildMasks(tracks), masks = [], i, tol = clip.tpf * 2, dur = clip.end - clip.start, outPoint = clip.inPoint + dur;
   var own = null;
+  var info = { tracksFound: tracks.length, decoded: all.length, fitting: 0, owner: 0, objectMask: false, sameClips: 1, seqFiltered: false };
+  clip.info = info;
   try { own = ownedRanges(xml, clip); } catch (e) { own = null; }
-  var info = { tracksFound: tracks.length, decoded: all.length, fitting: 0, owner: own ? own.length : 0, objectMask: false };
+  info.owner = own ? own.length : 0;
   // o clipe tem máscara mas sem keyframes salvos: Object Mask (IA, o projeto só guarda os cliques e referências ao cache) ou máscara não rastreada
   if (own && own.length) info.objectMask = own.some(function (r) { return xml.slice(r[0], r[1]).indexOf('AE.ADBE AEMask') >= 0; });
   for (i = 0; i < all.length; i++) {
@@ -1197,7 +1234,8 @@ function createHost(ppro, uxp, log) {
       log('Projeto lido: ' + (bytes.length / 1e6).toFixed(1) + ' MB' + (saved ? '' : ' (não confirmei o salvamento)') + ', XML ' + (xml.length / 1e6).toFixed(1) + ' MB');
       if (cache) cache.xml = xml;
     }
-    var found = prproj.readMasks(xml, { start: tm.start, end: tm.end, inPoint: tm.inPoint, mediaStart: tm.mediaStart, tpf: ft });
+    var found = prproj.readMasks(xml, { start: tm.start, end: tm.end, inPoint: tm.inPoint, mediaStart: tm.mediaStart, tpf: ft, seqGuid: String(seq.guid), seqName: String(seq.name || '') });
+    if (found.info.sameClips > 1) log('O mesmo clipe aparece em ' + found.info.sameClips + ' sequências na mesma posição; ' + (found.info.seqFiltered ? 'usei só o da sequência ativa.' : 'não consegui achar a sequência ativa no projeto (pode pegar a máscara de outra sequência).'));
     log('Blocos de keyframes: ' + found.info.tracksFound + ' | lidos como máscara: ' + found.info.decoded + ' | que cabem no clipe: ' + found.info.fitting);
     if (found.info.objectMask && !found.masks.length) log('O clipe tem máscara em Unassigned Masks, mas sem movimento salvo no projeto.');
     if (!found.masks.length) throw fail(found.info.objectMask ? 'OBJECT_MASK' : 'NO_PROJECT_MASK');
@@ -1643,7 +1681,7 @@ var DICT = {
 
 var LS = { lang: 'mectracker.lang', prefs: 'mectracker.prefs', upd: 'mectracker.update', updSkip: 'mectracker.updateSkip' };
 // aviso de atualização: confere a última release do GitHub (no máximo a cada 30 min; o resultado fica guardado)
-var VERSION = '3.3.8', REPO = 'hugomec7/MecTracker', UPD_EVERY = 30 * 6e4;
+var VERSION = '3.3.9', REPO = 'hugomec7/MecTracker', UPD_EVERY = 30 * 6e4;
 var SCALE = 0.125, SHUTTER = 360; // rastreio em 1/8 da resolução; Shutter Angle sempre 360
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
