@@ -48,65 +48,47 @@ Short videos with zoom and captions in English and Portuguese.
 ### 1. Open the panel
 Window > UXP Plugins > Mec Tracker.
 
-![Open the panel](docs/tutorials/01-open-the-panel.gif)
-
-[▶ Watch in MP4 (better quality)](docs/tutorials/01-open-the-panel.mp4)
+https://github.com/user-attachments/assets/da417025-9b33-4450-a4df-982a633ed7fa
 
 ### 2. Make a mask by hand
 Rectangle or Pen mask on the object, then track it forward with Premiere.
 
-![Make a mask by hand](docs/tutorials/02-mask-by-hand.gif)
-
-[▶ Watch in MP4 (better quality)](docs/tutorials/02-mask-by-hand.mp4)
+https://github.com/user-attachments/assets/5b50381b-3a0c-4a8b-8d1c-bd6df411a659
 
 ### 3. Automatic mask with Object Mask
 Click the object and Premiere masks it. Keep the Object Mask inside Opacity.
 
-![Automatic mask with Object Mask](docs/tutorials/03-object-mask.gif)
-
-[▶ Watch in MP4 (better quality)](docs/tutorials/03-object-mask.mp4)
+https://github.com/user-attachments/assets/0d3cff4e-addd-4643-99c7-443fd3549d9d
 
 ### 4. Track, then Paste
 Track the masked clip, select the target and click Paste.
 
-![Track, then Paste](docs/tutorials/04-track-and-paste.gif)
-
-[▶ Watch in MP4 (better quality)](docs/tutorials/04-track-and-paste.mp4)
+https://github.com/user-attachments/assets/4f367457-7684-48ee-bbc9-c02ad5777811
 
 ### 5. Paste Straight to Clip Above
 One click tracks and pastes onto the clip on the track above.
 
-![Paste Straight to Clip Above](docs/tutorials/05-paste-straight.gif)
-
-[▶ Watch in MP4 (better quality)](docs/tutorials/05-paste-straight.mp4)
+https://github.com/user-attachments/assets/a631369c-0ea3-4a2c-a875-ceba1a6d29c4
 
 ### 6. Mask, Nest and Paste Straight
 Nest the graphic so it moves as one piece, then Track & Paste.
 
-![Mask, Nest and Paste Straight](docs/tutorials/06-mask-nest-paste-straight.gif)
-
-[▶ Watch in MP4 (better quality)](docs/tutorials/06-mask-nest-paste-straight.mp4)
+https://github.com/user-attachments/assets/48bc37e8-9400-4d4a-bc84-35b33fe30180
 
 ### 7. Several clips: Track and Paste
 Track 5 clips at once, then paste onto 5 targets.
 
-![Several clips: Track and Paste](docs/tutorials/07-several-clips-track-paste.gif)
-
-[▶ Watch in MP4 (better quality)](docs/tutorials/07-several-clips-track-paste.mp4)
+https://github.com/user-attachments/assets/189dea34-a55d-455e-bb87-f75ead4b3c42
 
 ### 8. Several clips: Paste Straight
 Track & Paste 5 clips, one at a time, onto the clips above.
 
-![Several clips: Paste Straight](docs/tutorials/08-several-clips-paste-straight.gif)
-
-[▶ Watch in MP4 (better quality)](docs/tutorials/08-several-clips-paste-straight.mp4)
+https://github.com/user-attachments/assets/cc21d9d3-b2cd-4b62-b22b-38e0f21043b0
 
 ### 9. Stabilize a shot
 Track a point (the face) and paste with Stabilize on the same clip.
 
-![Stabilize a shot](docs/tutorials/09-stabilize.gif)
-
-[▶ Watch in MP4 (better quality)](docs/tutorials/09-stabilize.mp4)
+https://github.com/user-attachments/assets/8aceb283-3e60-418f-8b62-0d1e5142e219
 
 The same videos, in MP4, come in the **Tutoriais** folder of the [download](../../releases/latest).
 ## Install
