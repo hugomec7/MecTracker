@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.8
+- Track: the video tracks hidden while tracking now always show again at the end. Before, the panel only restored the tracks that Premiere already reported as hidden, and some stayed hidden.
+- If Premiere or the panel closes in the middle of a track, the panel shows those tracks again the next time it opens (or before the next action).
+
 ## 3.3.7
 - Stability: the panel no longer asks Premiere for the timeline selection every 600 ms. It only checks when the mouse enters the panel and right before each click. This constant polling could slow down and crash Premiere.
 - Track: the first frame is exported alone. Only when the mask cuts the clip does it switch to 4 frames in parallel. Masks in Unassigned Masks no longer start several exports at once before reading the project.

@@ -997,6 +997,33 @@ function createHost(ppro, uxp, log) {
     throw fail('EXPORT_TIMEOUT');
   }
 
+  // ------------------------------------------------------------------ ocultar/mostrar trilhas durante o render
+  var MUTE_KEY = 'mectracker.muteRestore';
+  async function restoreMuteList(tracks, list) {
+    var k, a;
+    for (a = 0; a < 3; a++) {
+      for (k = 0; k < list.length; k++) { try { await tracks[list[k][0]].setMute(list[k][1]); } catch (e) {} }
+      await sleep(150);
+      var bad = 0;
+      for (k = 0; k < list.length; k++) { try { if ((await tracks[list[k][0]].isMuted()) !== list[k][1]) bad++; } catch (e) {} }
+      if (!bad) return true;
+    }
+    log('Aviso: não consegui devolver a visibilidade de todas as trilhas. Confira o olho das trilhas de vídeo.');
+    return false;
+  }
+  // trilhas que ficaram ocultas porque o Premiere ou o painel fechou no meio de um rastreio
+  async function restorePendingMutes() {
+    var p = null;
+    try { p = JSON.parse(localStorage.getItem(MUTE_KEY) || 'null'); } catch (e) {}
+    if (!p || !p.list || !p.list.length) return;
+    var c = await context();
+    if (String(c.sequence.guid) !== p.seq) return;
+    var tracks = await videoTracks(c.sequence), list = p.list.filter(function (x) { return x[0] < tracks.length; });
+    await restoreMuteList(tracks, list);
+    try { localStorage.removeItem(MUTE_KEY); } catch (e) {}
+    log('Trilhas ocultas por um rastreio interrompido foram mostradas de novo.');
+  }
+
   // ------------------------------------------------------------------ rastrear (render): só enxerga máscaras do Opacity
   /** cancel = { cancelled:false } ; onProgress({done,total,msPerFrame}) */
   async function trackClip(seq, item, scale, onProgress, cancel, mode) {
@@ -1005,7 +1032,7 @@ function createHost(ppro, uxp, log) {
     var tm = await timing(item), startT = await item.getStartTime();
     var total = Math.max(0, Math.ceil((tm.end - tm.start) / frameTicks));
     if (!total) throw fail('NO_FRAMES');
-    var idx = await item.getTrackIndex(), tracks = await videoTracks(seq), muted = [], i;
+    var idx = await item.getTrackIndex(), tracks = await videoTracks(seq), muted = [], changed = [], i;
     for (i = 0; i < tracks.length; i++) muted.push(await tracks[i].isMuted());
     // mede 1 a cada "stride" quadros (o resto é interpolado): metade do tempo em clipes de 60 fps
     var stride = solver.strideFor(total), want = [];
@@ -1025,8 +1052,10 @@ function createHost(ppro, uxp, log) {
     }
     log('Clipe na timeline: ' + (tm.start / TICKS_PER_SEC).toFixed(3) + 's, ' + total + ' quadros, ' + fw + 'x' + fh + ' px' + (stride > 1 ? ', medindo 1 a cada ' + stride + ' quadros' : '') + (mode.seek ? ' (modo sequencial, movendo a agulha)' : ''));
     try {
-      for (i = 0; i < tracks.length; i++) if (i !== idx && !muted[i]) await tracks[i].setMute(true);
-      if (muted[idx]) await tracks[idx].setMute(false);
+      // guarda o que vai mudar antes de mudar: se o Premiere ou o painel fechar no meio, o painel desfaz na próxima vez
+      for (i = 0; i < tracks.length; i++) if ((i !== idx && !muted[i]) || (i === idx && muted[idx])) changed.push([i, muted[i]]);
+      try { localStorage.setItem(MUTE_KEY, JSON.stringify({ seq: String(seq.guid), list: changed })); } catch (e) {}
+      for (j = 0; j < changed.length; j++) await tracks[changed[j][0]].setMute(changed[j][0] !== idx);
       while (next < want.length && next < K) issue(next++);
       for (i = 0; i < want.length; i++) {
         if (cancel && cancel.cancelled) { cancelled = true; break; }
@@ -1061,7 +1090,9 @@ function createHost(ppro, uxp, log) {
       log('Tempo: ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s para ' + got.length + ' quadros medidos | espera pelo Premiere ' + Math.round(tWait / n) + ' ms/quadro | decodificar ' + Math.round(tDecode / n) + ' ms | medir ' + Math.round(tMeasure / n) + ' ms | paralelismo ' + K);
     } finally {
       for (j in jobs) { try { await jobs[j]; } catch (x) {} }
-      for (i = 0; i < tracks.length; i++) { try { if ((await tracks[i].isMuted()) !== muted[i]) await tracks[i].setMute(muted[i]); } catch (e) {} }
+      // antes conferia isMuted() e só desfazia o que parecia diferente; o Premiere às vezes ainda devolve o valor antigo e a trilha ficava oculta
+      await restoreMuteList(tracks, changed);
+      try { localStorage.removeItem(MUTE_KEY); } catch (e) {}
       if (playhead) { try { await seq.setPlayerPosition(playhead); } catch (e) {} }
     }
     var samples = solver.fillSamples(got, cancelled ? (got.length ? got[got.length - 1].i + 1 : 0) : total);
@@ -1491,7 +1522,7 @@ function createHost(ppro, uxp, log) {
 
   return {
     context: context, batchPlan: batchPlan, ticks: TT, selectedClip: selectedClip, selectedClips: selectedClips, clipsAbove: clipsAbove, track: track, trackClip: trackClip, trackFromProject: trackFromProject, pasteKeys: pasteKeys,
-    timing: timing, findTransform: findTransform, mapParams: mapParams, exportFrame: exportFrame
+    restorePendingMutes: restorePendingMutes, timing: timing, findTransform: findTransform, mapParams: mapParams, exportFrame: exportFrame
   };
 }
 
@@ -1612,7 +1643,7 @@ var DICT = {
 
 var LS = { lang: 'mectracker.lang', prefs: 'mectracker.prefs', upd: 'mectracker.update', updSkip: 'mectracker.updateSkip' };
 // aviso de atualização: confere a última release do GitHub (no máximo a cada 30 min; o resultado fica guardado)
-var VERSION = '3.3.7', REPO = 'hugomec7/MecTracker', UPD_EVERY = 30 * 6e4;
+var VERSION = '3.3.8', REPO = 'hugomec7/MecTracker', UPD_EVERY = 30 * 6e4;
 var SCALE = 0.125, SHUTTER = 360; // rastreio em 1/8 da resolução; Shutter Angle sempre 360
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -1746,6 +1777,7 @@ async function run(fn) {
   if (busy) { setStatus(tr('E_BUSY'), 'err'); return; }
   setBusy(true);
   for (var w = 0; selPolling && w < 50; w++) await new Promise(function (r) { setTimeout(r, 20); });
+  try { await host.restorePendingMutes(); } catch (e) {}
   try { await fn(); }
   catch (e) { var m = errText(e); setStatus(m, 'err'); log('✗ ' + m + (e && e.stack ? '\n' + String(e.stack).split('\n').slice(0, 3).join('\n') : '')); }
   finally { setBusy(false); }
@@ -2024,6 +2056,7 @@ function init() {
   $('app').addEventListener('mouseenter', pollSoon);
   window.addEventListener('focus', pollSoon);
   pollSoon();
+  host.restorePendingMutes().catch(function () {});
   checkUpdate(); setInterval(checkUpdate, UPD_EVERY);
   log('Mec Tracker ' + ((uxp.versions && uxp.versions.plugin) || '') + ' pronto.');
 }
