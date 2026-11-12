@@ -24,6 +24,7 @@ Mec Tracker is a free, open source panel for **Adobe Premiere Pro 2026**. Track 
 - **Paste Straight to Clip Above**: track and paste onto the clip on the track above in one click.
 - **Several clips at once**: track many masks in one go, then paste each track onto the targets you pick.
 - **Guided panel**: the blue button is always the next step, and the buttons show how many clips are selected.
+- **Claude control (MCP)**: Claude Desktop or Claude Code can track and paste for you through commands, no clicking. See [Use with Claude](#use-with-claude-mcp).
 - **Update notice**: the panel tells you when a new version is out here on GitHub.
 - English and Portuguese interface.
 
@@ -107,6 +108,20 @@ Installing a new version is the same: run the installer again. It replaces the o
 ![Update notice](docs/images/en/5-update.png)
 
 When a new release is published here, the panel shows the new version number, a **What's new** button with the release notes and a **Download** link. It checks GitHub every 30 minutes while the panel is open. To check right away, click **Check for updates** at the end of the Help tab.
+
+## Use with Claude (MCP)
+
+![Claude control in the Help tab](docs/images/en/claude.png)
+
+Claude (Desktop or Code) can run Mec Tracker for you through short commands, without screenshots or clicks on the screen. That is much faster and uses far fewer tokens than computer use.
+
+1. **Install the connector**
+   - **Claude Desktop**: download [`MecTracker.mcpb`](dist/MecTracker.mcpb) (it also comes in the `Claude` folder of the release zip) and double-click it, or drag it into **Settings > Extensions**.
+   - **Claude Code**: run `claude mcp add mectracker -- node "/path/to/Claude/server.js"` (the same `server.js` is in [`mcp/`](mcp)). Node 18 or newer.
+2. **Turn it on in the panel**: in Premiere open Mec Tracker, go to **Help** and tick **Allow Claude to control the panel**. A green **Claude** dot shows at the top when it is connected.
+3. **Ask Claude**, for example: *"Track the selected clip and paste it onto the text above it"* or *"Track the 3 clips on V1, then paste onto the titles on V2, stabilize off, one keyframe every 2 frames"*.
+
+You still create and track the mask in Premiere yourself; Claude takes it from there. Everything stays on your computer (`127.0.0.1`, port 47321). Details and the list of commands: [`mcp/README.md`](mcp/README.md).
 
 ## Requirements and limits
 

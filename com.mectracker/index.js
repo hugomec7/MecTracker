@@ -1624,7 +1624,9 @@ var DICT = {
     E_NO_TRANSFORM: 'Não consegui adicionar o efeito Transform ({0}). Adicione o efeito Transform manualmente ao clipe e tente de novo.',
     E_PARAMS: 'Não reconheci os parâmetros do Transform: {0}', E_REJECT_PREP: 'O Premiere recusou preparar os parâmetros do Transform.',
     E_REJECT_KEYS: 'O Premiere recusou os keyframes.', E_NO_MASK: 'A máscara não apareceu em nenhum quadro.',
-    E_NO_TRACK: 'Rastreie um clipe primeiro.', E_BUSY: 'Já existe uma operação em andamento.'
+    E_NO_TRACK: 'Rastreie um clipe primeiro.', E_BUSY: 'Já existe uma operação em andamento.',
+    claudeT: 'Controle pelo Claude', claudeTxt: 'Deixa o Claude (Desktop ou Code) usar o Mec Tracker por comandos, sem clicar na tela. Instale o conector <b>Mec Tracker MCP</b> no Claude (veja o README no GitHub) e marque a caixa abaixo.',
+    claudeAllow: 'Permitir controle pelo Claude', claudeOn: 'Claude conectado.', claudeWait: 'Esperando o Claude… (abra o Claude com o conector Mec Tracker instalado)', claudeNoClip: 'Clipe {0} não encontrado na sequência ativa.'
   },
   en: {
     tabMain: 'Track', tabHelp: 'Help',
@@ -1675,13 +1677,15 @@ var DICT = {
     E_NO_TRANSFORM: 'Could not add the Transform effect ({0}). Add the Transform effect to the clip manually and try again.',
     E_PARAMS: 'Could not recognise the Transform parameters: {0}', E_REJECT_PREP: 'Premiere rejected preparing the Transform parameters.',
     E_REJECT_KEYS: 'Premiere rejected the keyframes.', E_NO_MASK: 'The mask did not appear in any frame.',
-    E_NO_TRACK: 'Track a clip first.', E_BUSY: 'An operation is already running.'
+    E_NO_TRACK: 'Track a clip first.', E_BUSY: 'An operation is already running.',
+    claudeT: 'Claude control', claudeTxt: 'Lets Claude (Desktop or Code) use Mec Tracker through commands, without clicking on the screen. Install the <b>Mec Tracker MCP</b> connector in Claude (see the README on GitHub) and tick the box below.',
+    claudeAllow: 'Allow Claude to control the panel', claudeOn: 'Claude connected.', claudeWait: 'Waiting for Claude… (open Claude with the Mec Tracker connector installed)', claudeNoClip: 'Clip {0} not found in the active sequence.'
   }
 };
 
 var LS = { lang: 'mectracker.lang', prefs: 'mectracker.prefs', upd: 'mectracker.update', updSkip: 'mectracker.updateSkip' };
 // aviso de atualização: confere a última release do GitHub (no máximo a cada 30 min; o resultado fica guardado)
-var VERSION = '3.3.9', REPO = 'hugomec7/MecTracker', UPD_EVERY = 30 * 6e4;
+var VERSION = '3.4.0', REPO = 'hugomec7/MecTracker', UPD_EVERY = 30 * 6e4;
 var SCALE = 0.125, SHUTTER = 360; // rastreio em 1/8 da resolução; Shutter Angle sempre 360
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -1691,14 +1695,15 @@ var $ = function (id) { return document.getElementById(id); };
 var lang = 'en', busy = false, cancelTok = null, track = null, tracks = [], selCount = 0;
 // track = último rastreio (para o resumo); tracks = todos os rastreios guardados (1 ou vários clipes)
 function setTracks(list) { tracks = list || []; track = tracks.length ? tracks[tracks.length - 1] : null; }
-var st = { auto: false, action: 'follow', pos: true, scale: false, rot: false, step: 1, compact: false };
+var st = { auto: false, action: 'follow', pos: true, scale: false, rot: false, step: 1, compact: false, claude: false };
 var logLines = [];
 
 function tr(k) { var s = (DICT[lang] && DICT[lang][k]) || DICT.pt[k] || k, i; for (i = 1; i < arguments.length; i++) s = s.split('{' + (i - 1) + '}').join(arguments[i]); return s; }
 function showLog() { var el = $('log'); if (el) { el.value = logLines.join('\n'); try { el.scrollTop = el.scrollHeight; } catch (e) {} } }
 function log(m) { logLines.push(m); showLog(); try { console.log(m); } catch (e) {} }
 var statusIdle = true;
-function setStatus(text, cls) { var s = $('status'); statusIdle = !text; s.textContent = text || tr(track ? 'idle2' : 'idle'); s.className = 'status copyable' + (cls ? ' ' + cls : ''); }
+var lastStatus = { text: '', cls: '' };
+function setStatus(text, cls) { var s = $('status'); statusIdle = !text; lastStatus = { text: text || '', cls: cls || '' }; s.textContent = text || tr(track ? 'idle2' : 'idle'); s.className = 'status copyable' + (cls ? ' ' + cls : ''); }
 function errText(e) {
   if (e && e.code && DICT.pt['E_' + e.code]) return tr('E_' + e.code, e.detail);
   return H.msg(e);
@@ -1717,7 +1722,7 @@ function applyLang() {
   var els = document.querySelectorAll('[data-i]'), i;
   for (i = 0; i < els.length; i++) els[i].innerHTML = tr(els[i].getAttribute('data-i'));
   cls($('langPT'), 'on', lang === 'pt'); cls($('langEN'), 'on', lang === 'en');
-  renderTrack(); renderCount(); renderUpdate();
+  renderTrack(); renderCount(); renderUpdate(); bridgeRender();
   if (statusIdle) setStatus('');
 }
 
@@ -1731,7 +1736,8 @@ function refreshPrefs() {
   for (i = 0; i < btns.length; i++) cls(btns[i], 'on', btns[i].getAttribute('data-v') === String(st.action));
   cls($('chip-auto'), 'on', !!st.auto); cls($('chip-pos'), 'on', !!st.pos); cls($('chip-rot'), 'on', !!st.rot); cls($('chip-scale'), 'on', !!st.scale);
   $('step-val').textContent = String(st.step);
-  renderCount(); renderTrack();
+  cls($('chip-claude'), 'on', !!st.claude);
+  renderCount(); renderTrack(); bridgeSync();
 }
 function showTab(t) {
   cls($('page-main'), 'hidden', t !== 'main'); cls($('page-help'), 'hidden', t !== 'help');
@@ -1804,6 +1810,10 @@ async function pollSelection() {
     if (n !== selCount) { selCount = n; renderTrack(); }
   } catch (e) {} finally { selPolling = false; }
 }
+// comandos do Claude podem escolher os clipes sem mudar a seleção da timeline (forcedSel)
+var forcedSel = null, refOverride = null;
+function pickClips(seq) { return forcedSel ? Promise.resolve(forcedSel.slice()) : host.selectedClips(seq); }
+async function pickClip(seq) { if (!forcedSel) return host.selectedClip(seq); if (forcedSel.length !== 1) throw H.fail('SEL_ONE', String(forcedSel.length)); return forcedSel[0]; }
 async function refreshSelection() { try { var c = await host.context(); selCount = (await host.selectedClips(c.sequence)).length; } catch (e) {} }
 
 function setBusy(b) {
@@ -1823,6 +1833,7 @@ async function run(fn) {
 
 function onProgress(prefix) {
   return function (p) {
+    br.progress = { done: p.done, total: p.total, seconds_left: p.msPerFrame ? Math.max(0, Math.round((p.total - p.done) * p.msPerFrame / 1000)) : null, step: prefix || '' };
     $('trk-bar').style.width = Math.round(p.done / p.total * 100) + '%';
     cls($('trk-text'), 'hidden', false);
     $('trk-text').textContent = (prefix ? prefix + ' · ' : '') + (p.msPerFrame ? tr('progress', p.done, p.total, Math.max(0, Math.round((p.total - p.done) * p.msPerFrame / 1000))) : tr('reading'));
@@ -1836,7 +1847,7 @@ function pasteOpts() { return { pos: st.pos, scale: st.scale, rot: st.rot, follo
 function pasteLine(r) { return tr('doneLog', r.keyframes, r.name, st.step) + (r.added ? tr('transformAdded') : '') + (r.shutter === false ? tr('shutterFail') : tr('shutterOk', SHUTTER)); }
 
 async function onTrack() {
-  var c = await host.context(), item = await host.selectedClip(c.sequence);
+  var c = await host.context(), item = await pickClip(c.sequence);
   cancelTok = { cancelled: false };
   setTracks([]); renderTrack(); renderCount();
   setStatus(tr('tracking'), '');
@@ -1870,7 +1881,7 @@ async function onTrack() {
 
 // lote: rastreia cada clipe selecionado e cola no(s) clipe(s) acima dele, um por vez
 async function onBatch() {
-  var c = await host.context(), sel = await host.selectedClips(c.sequence);
+  var c = await host.context(), sel = await pickClips(c.sequence);
   if (!st.pos && !st.scale && !st.rot) throw H.fail('NO_PROPS');
   var plan = await host.batchPlan(c.sequence, sel), rows = plan.rows, n = rows.length;
   if (!n) throw H.fail('BATCH_NONE');
@@ -1927,7 +1938,7 @@ async function pasteTo(c, clips, refTime) {
 
 // vários clipes com o Colar Direto desligado: rastreia todos e guarda; o usuário escolhe os alvos e cola depois
 async function onTrackMany() {
-  var c = await host.context(), sel = await host.selectedClips(c.sequence), rows = [], i, rec, head, n, got = [], failed = 0, stopped = false, cache = {};
+  var c = await host.context(), sel = await pickClips(c.sequence), rows = [], i, rec, head, n, got = [], failed = 0, stopped = false, cache = {};
   if (sel.length < 2) return onTrack();
   for (i = 0; i < sel.length; i++) rows.push({ item: sel[i], start: (await host.timing(sel[i])).start, name: await sel[i].getName() });
   rows.sort(function (a, b) { return a.start - b.start; }); n = rows.length;
@@ -1962,9 +1973,9 @@ async function onTrackMany() {
 function trackRange(t) { return { start: t.startTicks, end: t.startTicks + t.samples.length * t.frameTicks }; }
 async function onApply() {
   if (!tracks.length) throw H.fail('NO_TRACK');
-  var c = await host.context(), clips = await host.selectedClips(c.sequence);
+  var c = await host.context(), clips = await pickClips(c.sequence);
   if (!clips.length) throw H.fail('SEL_ONE', '0');
-  var refTime = await c.sequence.getPlayerPosition();
+  var refTime = refOverride != null ? host.ticks(refOverride) : await c.sequence.getPlayerPosition();
   setStatus(tr('applying'), '');
   if (tracks.length === 1) { track = tracks[0]; await pasteTo(c, clips, refTime); setStatus(tr('done'), 'ok'); return; }
   var ok = 0, i, j, tm, best, bestOv, ov, r, s0, e0, ph = refTime.ticksNumber, name;
@@ -1981,6 +1992,163 @@ async function onApply() {
   }
   var text = tr('pasteMany', ok, clips.length) + (ok < clips.length ? tr('batchSkipped', clips.length - ok) : '');
   log(text); setStatus(ok === clips.length ? tr('done') : text, ok === clips.length ? 'ok' : 'err');
+}
+
+// ------------------------------------------------------------------ controle pelo Claude (MCP)
+// O UXP não deixa o painel abrir uma porta, então é o painel que se conecta, como cliente, ao servidor MCP
+// do Mec Tracker (pasta mcp/ do repositório), que roda no mesmo computador junto com o Claude Desktop ou o
+// Claude Code. O Claude manda comandos curtos (ver estado, listar clipes, rastrear, colar) e recebe texto,
+// sem precisar tirar print nem clicar na tela. Só liga com a caixa "Permitir controle pelo Claude" (Ajuda).
+var BRIDGE_PORT = 47321, BRIDGE_URLS = ['ws://127.0.0.1:' + BRIDGE_PORT, 'ws://localhost:' + BRIDGE_PORT];
+var br = { ws: null, up: false, timer: null, tries: 0, job: null, jobSeq: 0, progress: null };
+function bridgeRender() {
+  cls($('claude-dot'), 'hidden', !(st.claude && br.up));
+  var m = $('claude-msg'); if (m) { m.textContent = st.claude ? tr(br.up ? 'claudeOn' : 'claudeWait') : ''; cls(m, 'hidden', !st.claude); }
+}
+function bridgeSync() {
+  if (st.claude) { if (!br.ws && !br.timer) bridgeConnect(); }
+  else {
+    if (br.timer) { clearTimeout(br.timer); br.timer = null; }
+    var ws = br.ws; br.ws = null; br.up = false; br.tries = 0;
+    if (ws) { try { ws.close(); } catch (e) {} log('Claude desconectado.'); }
+  }
+  bridgeRender();
+}
+function bridgeRetry() {
+  if (!st.claude || br.timer || br.ws) return;
+  br.tries++; br.timer = setTimeout(function () { br.timer = null; bridgeConnect(); }, Math.min(10000, 1500 * br.tries));
+}
+function bridgeConnect() {
+  if (!st.claude || br.ws) return;
+  var ws, url = BRIDGE_URLS[br.tries % BRIDGE_URLS.length];
+  try { ws = new WebSocket(url); } catch (e) { bridgeRetry(); return; }
+  br.ws = ws;
+  ws.onopen = function () {
+    if (br.ws !== ws) return;
+    br.up = true; br.tries = 0;
+    bridgeSend({ type: 'hello', plugin: 'mectracker', version: myVersion(), lang: lang });
+    log('Claude conectado.'); bridgeRender();
+  };
+  ws.onmessage = function (ev) { if (br.ws === ws) onBridgeMsg(ev.data); };
+  ws.onclose = function () {
+    if (br.ws !== ws) return;
+    var was = br.up; br.ws = null; br.up = false;
+    if (was) log('Claude desconectado.');
+    bridgeRender(); bridgeRetry();
+  };
+  ws.onerror = function () {};
+}
+function bridgeSend(o) { if (br.ws && br.up) { try { br.ws.send(JSON.stringify(o)); } catch (e) {} } }
+
+function secs(ticks) { return Math.round(ticks / H.TICKS_PER_SEC * 1000) / 1000; }
+async function clipKey(item, t) { var i = -1; try { i = Number(await item.getTrackIndex()); } catch (e) {} return 'V' + (i + 1) + '-' + (t || await host.timing(item)).start; }
+async function clipView(item, id) {
+  var t = await host.timing(item);
+  return { id: id || await clipKey(item, t), name: await item.getName(), start: secs(t.start), end: secs(t.end) };
+}
+// todos os clipes de vídeo da sequência ativa; id = trilha + início em ticks (ex.: V2-254016000000)
+async function allClips(seq) {
+  var n = await seq.getVideoTrackCount(), out = [], i, j, items, t;
+  for (i = 0; i < n; i++) {
+    items = await (await seq.getVideoTrack(i)).getTrackItems(ppro.Constants.TrackItemType.CLIP, false);
+    for (j = 0; j < items.length; j++) {
+      if (!(items[j] instanceof ppro.VideoClipTrackItem)) continue;
+      t = await host.timing(items[j]);
+      out.push({ item: items[j], id: 'V' + (i + 1) + '-' + t.start, track: 'V' + (i + 1), t: t });
+    }
+  }
+  return out;
+}
+async function clipsById(seq, ids) {
+  var all = await allClips(seq), map = {}, out = [], i;
+  all.forEach(function (c) { map[c.id] = c.item; });
+  for (i = 0; i < ids.length; i++) {
+    if (!map[ids[i]]) throw new Error(tr('claudeNoClip', ids[i]));
+    if (out.indexOf(map[ids[i]]) < 0) out.push(map[ids[i]]);
+  }
+  return out;
+}
+function trackList() {
+  return tracks.map(function (t) {
+    var vis = 0; t.samples.forEach(function (s) { if (!s.lost) vis++; });
+    return { clip: t.clipName, sequence: t.sequenceName, start: secs(t.startTicks), end: secs(t.startTicks + t.samples.length * t.frameTicks), frames: t.samples.length, frames_with_mask: vis, complete: !!t.complete, pasted: !!t.pasted, source: t.source, static: !!t.static };
+  });
+}
+function optionView() { return { action: st.action, position: st.pos, rotation: st.rot, scale: st.scale, every_frames: st.step, paste_to_clip_above: st.auto }; }
+function jobView(j) {
+  if (!j) return null;
+  var o = { id: j.id, kind: j.kind, clips: j.clips, done: j.done, seconds: Math.round(((j.ended || Date.now()) - j.started) / 100) / 10 };
+  if (j.done) { o.ok = j.ok; o.status = j.status; o.log = j.log; o.tracks = j.tracks; }
+  else o.progress = br.progress;
+  return o;
+}
+async function bridgeStatus() {
+  var o = { plugin: 'Mec Tracker', version: myVersion(), language: lang, busy: busy, options: optionView(), tracks: trackList(), job: jobView(br.job), status: lastStatus.text };
+  try {
+    var c = await host.context(), sel = await host.selectedClips(c.sequence), i;
+    o.sequence = c.sequence.name; o.playhead = secs((await c.sequence.getPlayerPosition()).ticksNumber);
+    o.selected = []; for (i = 0; i < sel.length; i++) o.selected.push(await clipView(sel[i]));
+  } catch (e) { o.premiere = errText(e); }
+  return o;
+}
+async function bridgeClips() {
+  var c = await host.context(), all = await allClips(c.sequence), sel = await host.selectedClips(c.sequence), keys = {}, i, out = [];
+  for (i = 0; i < sel.length; i++) keys[await clipKey(sel[i])] = true;
+  for (i = 0; i < all.length; i++) out.push({ id: all[i].id, track: all[i].track, name: await all[i].item.getName(), start: secs(all[i].t.start), end: secs(all[i].t.end), selected: !!keys[all[i].id] });
+  return { sequence: c.sequence.name, playhead: secs((await c.sequence.getPlayerPosition()).ticksNumber), clips: out };
+}
+function bridgeOptions(a) {
+  if (busy) throw H.fail('BUSY');
+  if (a.action === 'follow' || a.action === 'stabilize') st.action = a.action;
+  if (typeof a.position === 'boolean') st.pos = a.position;
+  if (typeof a.rotation === 'boolean') st.rot = a.rotation;
+  if (typeof a.scale === 'boolean') st.scale = a.scale;
+  if (typeof a.paste_to_clip_above === 'boolean') st.auto = a.paste_to_clip_above;
+  if (a.every_frames != null) st.step = Math.max(1, Math.min(240, parseInt(a.every_frames, 10) || 1));
+  refreshPrefs(); save();
+  return optionView();
+}
+// rastrear/colar viram um "job": responde na hora e avisa o servidor quando termina (pode levar minutos)
+async function bridgeJob(kind, a) {
+  if (busy) throw H.fail('BUSY');
+  if (kind === 'paste' && !tracks.length) throw H.fail('NO_TRACK');
+  if (kind === 'track' && typeof a.paste_to_clip_above === 'boolean' && a.paste_to_clip_above !== st.auto) { st.auto = a.paste_to_clip_above; refreshPrefs(); save(); }
+  var c = await host.context(), sel = (a.clips && a.clips.length) ? await clipsById(c.sequence, a.clips) : await host.selectedClips(c.sequence);
+  if (!sel.length) throw H.fail('SEL_ONE', '0');
+  var from = logLines.length, action = kind === 'paste' ? 'paste' : (sel.length >= 2 ? (st.auto ? 'batch' : 'many') : 'track');
+  var job = br.job = { id: ++br.jobSeq, kind: action, clips: sel.length, started: Date.now(), done: false };
+  forcedSel = sel; selCount = sel.length; br.progress = null;
+  refOverride = (kind === 'paste' && a.reference_seconds != null && isFinite(Number(a.reference_seconds))) ? Math.round(Number(a.reference_seconds) * H.TICKS_PER_SEC) : null;
+  showTab('main'); renderTrack();
+  log('Claude: ' + action + ' (' + sel.length + ')');
+  run(async function () { await doAction(action); }).then(function () {
+    forcedSel = null; refOverride = null; br.progress = null;
+    job.done = true; job.ended = Date.now(); job.ok = lastStatus.cls !== 'err'; job.status = lastStatus.text;
+    job.log = logLines.slice(from + 1).slice(-40); job.tracks = trackList();
+    bridgeSend({ type: 'job', job: jobView(job) });
+    pollSelection();
+  });
+  return jobView(job);
+}
+async function onBridgeMsg(data) {
+  var m; try { m = JSON.parse(data); } catch (e) { return; }
+  if (!m || m.type !== 'cmd') return;
+  var a = m.args || {}, r;
+  try {
+    switch (m.cmd) {
+      case 'status': r = await bridgeStatus(); break;
+      case 'clips': r = await bridgeClips(); break;
+      case 'options': r = bridgeOptions(a); break;
+      case 'track': r = await bridgeJob('track', a); break;
+      case 'paste': r = await bridgeJob('paste', a); break;
+      case 'job': r = jobView(br.job); break;
+      case 'cancel': if (cancelTok) { cancelTok.cancelled = true; setStatus(tr('cancelling'), ''); } r = { cancelling: !!cancelTok }; break;
+      case 'discard': if (busy) throw H.fail('BUSY'); setTracks([]); renderTrack(); renderCount(); setStatus(''); r = { tracks: [] }; break;
+      case 'log': r = { lines: logLines.slice(-Math.max(1, Math.min(500, parseInt(a.lines, 10) || 60))) }; break;
+      default: throw new Error('Unknown command: ' + m.cmd);
+    }
+    bridgeSend({ type: 'reply', id: m.id, ok: true, result: r });
+  } catch (e) { bridgeSend({ type: 'reply', id: m.id, ok: false, error: errText(e) }); }
 }
 
 // efeito de mouse por cima (o :hover do CSS pode não funcionar em <div> no UXP, então também marcamos por JS)
@@ -2055,7 +2223,7 @@ function init() {
   var l = lsGet(LS.lang); if (l === 'en' || l === 'pt') lang = l;
   try { applyPrefs(JSON.parse(lsGet(LS.prefs) || 'null')); } catch (e) {}
   seg('seg-action', 'action');
-  chip('chip-auto', 'auto'); chip('chip-pos', 'pos'); chip('chip-rot', 'rot'); chip('chip-scale', 'scale');
+  chip('chip-auto', 'auto'); chip('chip-pos', 'pos'); chip('chip-claude', 'claude'); chip('chip-rot', 'rot'); chip('chip-scale', 'scale');
   $('step-minus').addEventListener('click', function () { setStep(st.step - 1); });
   $('step-plus').addEventListener('click', function () { setStep(st.step + 1); });
   click('tab-main', function () { showTab('main'); });

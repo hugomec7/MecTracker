@@ -24,6 +24,7 @@ O Mec Tracker é um painel gratuito e de código aberto para o **Adobe Premiere 
 - **Colar Direto no Clipe de Cima**: rastreia e cola no clipe da trilha de cima com um clique.
 - **Vários clipes de uma vez**: rastreie várias máscaras e depois cole cada rastreio nos alvos que você escolher.
 - **Painel que guia**: o botão azul é sempre o próximo passo, e os botões mostram quantos clipes estão selecionados.
+- **Controle pelo Claude (MCP)**: o Claude Desktop ou o Claude Code rastreia e cola para você por comandos, sem clicar. Veja [Usar com o Claude](#usar-com-o-claude-mcp).
 - **Aviso de atualização**: o painel avisa quando sair uma versão nova aqui no GitHub.
 - Interface em português e inglês.
 
@@ -107,6 +108,20 @@ Para instalar uma versão nova, é só rodar o instalador de novo. Ele substitui
 ![Aviso de atualização](docs/images/pt/5-update.png)
 
 Quando sair uma release nova aqui, o painel mostra o número da versão nova, um botão **Ver novidades** com as notas da versão e um link **Baixar**. Ele confere o GitHub a cada 30 minutos com o painel aberto. Para conferir na hora, clique em **Verificar atualizações** no fim da aba Ajuda.
+
+## Usar com o Claude (MCP)
+
+![Controle pelo Claude na aba Ajuda](docs/images/pt/claude.png)
+
+O Claude (Desktop ou Code) pode usar o Mec Tracker por você com comandos curtos, sem tirar print nem clicar na tela. É muito mais rápido e gasta muito menos tokens do que o controle do computador.
+
+1. **Instale o conector**
+   - **Claude Desktop**: baixe o [`MecTracker.mcpb`](dist/MecTracker.mcpb) (ele também vem na pasta `Claude` do zip da release) e dê dois cliques nele, ou arraste para **Configurações > Extensões**.
+   - **Claude Code**: rode `claude mcp add mectracker -- node "/caminho/para/Claude/server.js"` (o mesmo `server.js` está em [`mcp/`](mcp)). Precisa do Node 18 ou mais novo.
+2. **Ligue no painel**: no Premiere abra o Mec Tracker, vá em **Ajuda** e marque **Permitir controle pelo Claude**. Uma bolinha verde **Claude** aparece no topo quando ele conecta.
+3. **Peça ao Claude**, por exemplo: *"Rastreie o clipe selecionado e cole no texto de cima"* ou *"Rastreie os 3 clipes da V1 e cole nos títulos da V2, um keyframe a cada 2 frames"*.
+
+A máscara você ainda cria e rastreia no Premiere; o Claude faz o resto. Tudo fica no seu computador (`127.0.0.1`, porta 47321). Detalhes e a lista de comandos: [`mcp/README.pt-BR.md`](mcp/README.pt-BR.md).
 
 ## Requisitos e limites
 

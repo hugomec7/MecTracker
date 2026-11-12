@@ -1,0 +1,40 @@
+{
+  "manifest_version": "0.2",
+  "name": "mectracker",
+  "display_name": "Mec Tracker",
+  "version": "3.4.0",
+  "description": "Lets Claude drive the Mec Tracker panel in Premiere Pro (track masks, paste keyframes) without screenshots or clicks.",
+  "long_description": "Mec Tracker reads the motion of a mask in Premiere Pro and pastes it as Transform keyframes on other clips (follow) or on the same clip (stabilize). This connector gives Claude short commands for the panel: status, list clips, set options, track, paste, wait, cancel, discard and log. In Premiere, open the Mec Tracker panel (3.4.0 or newer), go to Help and tick \"Allow Claude to control the panel\". Everything stays on your computer (127.0.0.1).",
+  "author": { "name": "Hugo Mec", "url": "https://github.com/hugomec7" },
+  "repository": { "type": "git", "url": "https://github.com/hugomec7/MecTracker" },
+  "homepage": "https://github.com/hugomec7/MecTracker",
+  "documentation": "https://github.com/hugomec7/MecTracker/tree/main/mcp",
+  "support": "https://github.com/hugomec7/MecTracker/issues",
+  "icon": "icon.png",
+  "server": {
+    "type": "node",
+    "entry_point": "server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server.js"],
+      "env": {}
+    }
+  },
+  "tools": [
+    { "name": "mectracker_status", "description": "Panel state: sequence, playhead, selection, options, tracks, current job." },
+    { "name": "mectracker_list_clips", "description": "Video clips of the active sequence with ids." },
+    { "name": "mectracker_set_options", "description": "Follow/Stabilize, Position/Rotation/Scale, keyframe interval, Paste Straight to Clip Above." },
+    { "name": "mectracker_track", "description": "Track the mask of the given or selected clip(s)." },
+    { "name": "mectracker_paste", "description": "Paste the stored track(s) onto target clips." },
+    { "name": "mectracker_wait", "description": "Wait for the running job." },
+    { "name": "mectracker_cancel", "description": "Cancel the running track." },
+    { "name": "mectracker_discard_tracks", "description": "Discard stored tracks." },
+    { "name": "mectracker_log", "description": "Last lines of the panel log." }
+  ],
+  "keywords": ["premiere pro", "motion tracking", "uxp", "video editing", "mask"],
+  "license": "MIT",
+  "compatibility": {
+    "platforms": ["darwin", "win32"],
+    "runtimes": { "node": ">=18.0.0" }
+  }
+}

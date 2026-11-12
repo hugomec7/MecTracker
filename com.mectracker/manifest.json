@@ -1,7 +1,7 @@
 {
   "id": "com.mectracker",
   "name": "Mec Tracker",
-  "version": "3.3.9",
+  "version": "3.4.0",
   "main": "index.html",
   "host": {
     "app": "premierepro",
@@ -19,7 +19,9 @@
     },
     "network": {
       "domains": [
-        "https://api.github.com"
+        "https://api.github.com",
+        "ws://127.0.0.1:47321",
+        "ws://localhost:47321"
       ]
     }
   },
