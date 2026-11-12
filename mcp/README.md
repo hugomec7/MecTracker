@@ -10,6 +10,24 @@ UXP panels cannot open a port, so the panel connects to this server as a client.
 
 ## Install
 
+**Easiest**: in Claude Code (or the Code tab of Claude Desktop) paste `Install Mec Tracker for me: https://github.com/hugomec7/MecTracker`. Claude follows the steps in the main README and installs this connector plus the Premiere plugin.
+
+**Claude Code plugin** (this folder is a Claude Code plugin; the repo root is its marketplace):
+
+```text
+/plugin install mectracker --marketplace hugomec7/MecTracker
+```
+
+**Premiere plugin from the command line** (downloads the latest release and runs its installer):
+
+```bash
+npx -y https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz --install-premiere-plugin
+```
+
+The same thing is available to Claude as the `mectracker_install_plugin` tool.
+
+### Other ways
+
 **Copy and paste into Claude** (Claude Code, or the Code tab of Claude Desktop). It installs itself. Needs [Node.js](https://nodejs.org) 18+:
 
 ```text
@@ -57,6 +75,7 @@ Then in Premiere: **Mec Tracker > Help > Allow Claude to control the panel**. Th
 | `mectracker_cancel` | Cancels the running track. |
 | `mectracker_discard_tracks` | Clears the stored tracks. |
 | `mectracker_log` | Last lines of the panel log. |
+| `mectracker_install_plugin` | Installs or updates the Premiere plugin (latest release from GitHub). |
 
 `track` and `paste` wait up to `wait_seconds` (default 45). Longer jobs return their progress; call `mectracker_wait` to keep waiting. Clip ids let Claude pick clips without touching your timeline selection.
 

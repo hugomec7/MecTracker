@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "mectracker",
+  "displayName": "Mec Tracker",
+  "version": "3.4.0",
+  "description": "Lets Claude run the Mec Tracker panel in Premiere Pro (track masks, paste Transform keyframes) without screenshots or clicks.",
+  "author": { "name": "Hugo Mec", "url": "https://github.com/hugomec7" },
+  "homepage": "https://github.com/hugomec7/MecTracker",
+  "repository": "https://github.com/hugomec7/MecTracker",
+  "license": "MIT",
+  "keywords": ["premiere-pro", "motion-tracking", "video-editing", "mcp"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}

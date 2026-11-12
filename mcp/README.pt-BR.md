@@ -10,6 +10,24 @@ Painéis UXP não podem abrir uma porta, então é o painel que se conecta a est
 
 ## Instalar
 
+**O mais fácil**: no Claude Code (ou na aba Code do Claude Desktop) cole `Instale o Mec Tracker para mim: https://github.com/hugomec7/MecTracker`. O Claude segue os passos do README principal e instala este conector e o plugin do Premiere.
+
+**Plugin do Claude Code** (esta pasta é um plugin do Claude Code; a raiz do repositório é o marketplace dele):
+
+```text
+/plugin install mectracker --marketplace hugomec7/MecTracker
+```
+
+**Plugin do Premiere pela linha de comando** (baixa a release mais nova e roda o instalador):
+
+```bash
+npx -y https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz --install-premiere-plugin
+```
+
+O Claude também tem isso como a ferramenta `mectracker_install_plugin`.
+
+### Outros jeitos
+
 **Copie e cole no Claude** (Claude Code, ou a aba Code do Claude Desktop). Ele instala sozinho. Precisa do [Node.js](https://nodejs.org) 18+:
 
 ```text
@@ -57,6 +75,7 @@ Depois, no Premiere: **Mec Tracker > Ajuda > Permitir controle pelo Claude**. O 
 | `mectracker_cancel` | Cancela o rastreio em andamento. |
 | `mectracker_discard_tracks` | Apaga os rastreios guardados. |
 | `mectracker_log` | Últimas linhas do registro do painel. |
+| `mectracker_install_plugin` | Instala ou atualiza o plugin no Premiere (release mais nova do GitHub). |
 
 `track` e `paste` esperam até `wait_seconds` (padrão 45). Tarefas mais longas devolvem o progresso; o Claude chama `mectracker_wait` para continuar esperando. Com os ids, o Claude escolhe os clipes sem mexer na sua seleção da timeline.
 

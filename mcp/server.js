@@ -109,7 +109,7 @@ function onPanelMessage(conn, text) {
 
 function notConnected() {
   if (portBusy) return new Error(`Port ${PORT} is already used by another program (probably another Claude window with the Mec Tracker connector). Close the other one, or set MECTRACKER_PORT.`);
-  return new Error('The Mec Tracker panel is not connected. In Premiere Pro open Window > UXP Plugins > Mec Tracker, go to the Help tab and tick "Allow Claude to control the panel" (it connects within ~10 s). Mec Tracker 3.4.0 or newer is needed.');
+  return new Error('The Mec Tracker panel is not connected. If Mec Tracker is not installed in Premiere (or is older than 3.4.0), call mectracker_install_plugin. Otherwise: in Premiere Pro open Window > UXP Plugins > Mec Tracker, go to the Help tab and tick "Allow Claude to control the panel" (it connects within ~10 s). Mec Tracker 3.4.0 or newer is needed.');
 }
 
 function send(cmd, args) {
@@ -157,6 +157,72 @@ function startSocketServer() {
     else { warn('socket server error:', e.message); setTimeout(startSocketServer, 5000).unref(); }
   });
   server.listen(PORT, HOST, () => { listening = true; portBusy = false; warn('waiting for the panel on ws://' + HOST + ':' + PORT); });
+}
+
+// ------------------------------------------------------------------ instalar o plugin no Premiere
+// Baixa a release mais nova do GitHub, extrai (tar entende zip no Windows 10+ e no Mac) e roda o
+// instalador do zip: no Windows abre o Install-Windows.bat (pede permissão de administrador),
+// no Mac pede a senha numa janela do sistema (osascript) e roda o Install-Mac.command.
+const REPO = 'hugomec7/MecTracker';
+const os = require('os');
+const fs = require('fs');
+const path = require('path');
+const { execFile, spawn } = require('child_process');
+
+function run(cmd, args, opts) {
+  return new Promise((resolve, reject) => {
+    execFile(cmd, args, Object.assign({ maxBuffer: 16 * 1024 * 1024 }, opts), (err, stdout, stderr) => {
+      if (err) { err.message += (stderr ? '\n' + stderr : ''); reject(err); } else resolve(String(stdout));
+    });
+  });
+}
+function findFile(dir, name) {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name);
+    if (e.isFile() && e.name === name) return p;
+    if (e.isDirectory()) { const r = findFile(p, name); if (r) return r; }
+  }
+  return null;
+}
+function newerOrSame(a, b) {
+  const x = String(a).replace(/^v/, '').split('.').map(Number), y = String(b).split('.').map(Number);
+  for (let i = 0; i < 3; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); }
+  return true;
+}
+async function installPremierePlugin() {
+  if (process.platform !== 'win32' && process.platform !== 'darwin') throw new Error('Premiere Pro only runs on Windows and macOS.');
+  const headers = { 'User-Agent': 'mectracker-mcp', Accept: 'application/vnd.github+json' };
+  // a maior versão publicada que tenha um zip (a "latest" do GitHub pode ser uma release sem arquivo)
+  const list = await (await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=30`, { headers })).json();
+  if (!Array.isArray(list)) throw new Error('Could not read the releases of ' + REPO + ' on GitHub' + (list && list.message ? ': ' + list.message : '.'));
+  const ok = list.filter((r) => !r.draft && !r.prerelease && (r.assets || []).some((x) => /\.zip$/i.test(x.name)));
+  ok.sort((p, q) => (newerOrSame(p.tag_name, String(q.tag_name).replace(/^v/, '')) ? -1 : 1));
+  const rel = ok[0];
+  if (!rel) throw new Error('No release with a zip found in ' + REPO + '.');
+  const asset = rel.assets.find((x) => /\.zip$/i.test(x.name));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mectracker-'));
+  const zip = path.join(dir, asset.name);
+  const res = await fetch(asset.browser_download_url, { headers: { 'User-Agent': 'mectracker-mcp' } });
+  if (!res.ok) throw new Error('Download failed: HTTP ' + res.status);
+  fs.writeFileSync(zip, Buffer.from(await res.arrayBuffer()));
+  await run('tar', ['-xf', zip, '-C', dir]);
+  const out = { version: rel.tag_name, downloaded: asset.name, folder: dir };
+  if (!newerOrSame(rel.tag_name, '3.4.0')) out.warning = 'This release is older than 3.4.0 and has no "Allow Claude to control the panel" option yet.';
+  if (process.platform === 'win32') {
+    const bat = findFile(dir, 'Install-Windows.bat');
+    if (!bat) throw new Error('Install-Windows.bat not found in the zip.');
+    spawn('cmd.exe', ['/c', 'start "" "' + bat + '"'], { cwd: path.dirname(bat), detached: true, stdio: 'ignore', windowsVerbatimArguments: true }).unref();
+    out.status = 'The installer window is open. Accept the administrator prompt (Yes), wait for "Done" and press a key to close it.';
+  } else {
+    const sh = findFile(dir, 'Install-Mac.command');
+    if (!sh) throw new Error('Install-Mac.command not found in the zip.');
+    const q = (t) => "'" + t.replace(/'/g, "'\\''") + "'";
+    const script = 'do shell script ' + JSON.stringify('/bin/bash ' + q(sh)) + ' with administrator privileges with prompt "Mec Tracker wants to install its Premiere Pro plugin."';
+    out.log = (await run('osascript', ['-e', script])).trim();
+    out.status = 'Installed.';
+  }
+  out.next = 'Restart Premiere Pro, open Window > UXP Plugins > Mec Tracker, go to Help and tick "Allow Claude to control the panel".';
+  return out;
 }
 
 // ------------------------------------------------------------------ MCP tools
@@ -218,6 +284,11 @@ const TOOLS = [
     inputSchema: { type: 'object', properties: {} },
   },
   {
+    name: 'mectracker_install_plugin',
+    description: 'Installs (or updates) the Mec Tracker plugin in Premiere Pro on this computer: downloads the latest release from GitHub and runs its installer. Windows shows an administrator prompt; macOS asks for the password in a system window. Premiere must be restarted afterwards. Use it when mectracker_status says the panel is not connected and the user does not have Mec Tracker 3.4.0+ installed.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
     name: 'mectracker_log',
     description: 'Last lines of the panel log (Help tab > Log). Useful when something failed.',
     inputSchema: { type: 'object', properties: { lines: { type: 'integer', minimum: 1, maximum: 500 } } },
@@ -260,6 +331,7 @@ async function callTool(name, a) {
     case 'mectracker_cancel': return send('cancel');
     case 'mectracker_discard_tracks': return send('discard');
     case 'mectracker_log': return send('log', { lines: a.lines });
+    case 'mectracker_install_plugin': return installPremierePlugin();
     default: throw new Error('Unknown tool: ' + name);
   }
 }
@@ -320,5 +392,11 @@ function startStdio() {
   process.stdin.on('end', () => process.exit(0));
 }
 
-startSocketServer();
-startStdio();
+if (process.argv.includes('--install-premiere-plugin')) {
+  installPremierePlugin().then((r) => { console.log(JSON.stringify(r, null, 2)); process.exit(0); }, (e) => { console.error('Error: ' + e.message); process.exit(1); });
+} else if (process.argv.includes('--version')) {
+  console.log(VERSION);
+} else {
+  startSocketServer();
+  startStdio();
+}

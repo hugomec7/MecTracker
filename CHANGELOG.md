@@ -2,6 +2,7 @@
 
 ## 3.4.0
 - Claude control (MCP): Claude Desktop or Claude Code can now run Mec Tracker through commands (status, list clips, options, track, paste, wait, cancel, discard, log) instead of screenshots and clicks. Install the connector from the `Claude` folder of the download (`MecTracker.mcpb`), then tick **Allow Claude to control the panel** in the Help tab. A green **Claude** dot shows at the top while it is connected. See [mcp/README.md](mcp/README.md).
+- Install with Claude: paste `Install Mec Tracker for me: https://github.com/hugomec7/MecTracker` into Claude Code and it installs the Claude plugin (marketplace in this repo) and the Premiere plugin (`--install-premiere-plugin`, or the `mectracker_install_plugin` tool).
 - Everything stays on your computer: the panel connects only to `127.0.0.1:47321`, and only while the box is ticked (off by default).
 
 ## 3.3.9
