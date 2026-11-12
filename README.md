@@ -4,6 +4,7 @@
 
 <p align="center">
   <a href="../../releases/latest">Download</a> ·
+  <a href="#use-with-claude-mcp">Install with Claude</a> ·
   <a href="#tutorials">Video tutorials</a> ·
   <a href="docs/guides/MecTracker-Guide_en-us.pdf">User guide (PDF)</a> ·
   <a href="README.pt-BR.md">🇧🇷 Leia em português</a>
@@ -24,6 +25,7 @@ Mec Tracker is a free, open source panel for **Adobe Premiere Pro 2026**. Track 
 - **Paste Straight to Clip Above**: track and paste onto the clip on the track above in one click.
 - **Several clips at once**: track many masks in one go, then paste each track onto the targets you pick.
 - **Guided panel**: the blue button is always the next step, and the buttons show how many clips are selected.
+- **Claude control (MCP)**: Claude Desktop or Claude Code can track and paste for you through commands, no clicking. See [Use with Claude](#use-with-claude-mcp).
 - **Update notice**: the panel tells you when a new version is out here on GitHub.
 - English and Portuguese interface.
 
@@ -107,6 +109,44 @@ Installing a new version is the same: run the installer again. It replaces the o
 ![Update notice](docs/images/en/5-update.png)
 
 When a new release is published here, the panel shows the new version number, a **What's new** button with the release notes and a **Download** link. It checks GitHub every 30 minutes while the panel is open. To check right away, click **Check for updates** at the end of the Help tab.
+
+## Use with Claude (MCP)
+
+![Claude control in the Help tab](docs/images/en/claude.png)
+
+Claude (Desktop or Code) can run Mec Tracker for you through short commands, without screenshots or clicks on the screen. That is much faster and uses far fewer tokens than computer use.
+
+1. **Install everything with Claude**: in **Claude Code** (or the **Code** tab of Claude Desktop), paste:
+   ```text
+   Install Mec Tracker for me: https://github.com/hugomec7/MecTracker
+   ```
+   Claude installs its connector and the Premiere plugin by itself. Accept the administrator prompt (Windows) or type your password (Mac) when it shows up.
+   - Claude Code, by hand: `/plugin install mectracker --marketplace hugomec7/MecTracker`
+   - Claude Desktop chat (no Code tab): double-click [`MecTracker.mcpb`](dist/MecTracker.mcpb) (also in the `Claude` folder of the release zip), then ask Claude: *"Install the Mec Tracker plugin in Premiere"*.
+2. **Turn it on in the panel**: in Premiere open Mec Tracker, go to **Help** and tick **Allow Claude to control the panel**. A green **Claude** dot shows at the top when it is connected.
+3. **Ask Claude**, for example: *"Track the selected clip and paste it onto the text above it"* or *"Track the 3 clips on V1, then paste onto the titles on V2, stabilize off, one keyframe every 2 frames"*.
+
+You still create and track the mask in Premiere yourself; Claude takes it from there. Everything stays on your computer (`127.0.0.1`, port 47321). Details and the list of commands: [`mcp/README.md`](mcp/README.md).
+
+<details>
+<summary><b>For AI assistants: install steps</b></summary>
+
+When a user asks you to install Mec Tracker from this page, run these on their computer, in order:
+
+1. Claude plugin (MCP server + skill):
+   ```bash
+   claude plugin marketplace add hugomec7/MecTracker
+   claude plugin install mectracker@mectracker
+   ```
+   No `claude` command (e.g. plain Claude Desktop chat)? Tell the user to double-click [`dist/MecTracker.mcpb`](dist/MecTracker.mcpb) instead.
+2. Premiere plugin (downloads the latest release and runs its installer; Windows shows an administrator prompt, macOS asks for the password in a system window, so tell the user to watch for it):
+   ```bash
+   npx -y https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz --install-premiere-plugin
+   ```
+   Needs Node.js 18+. Without Node, after step 1 and a restart of Claude, call the `mectracker_install_plugin` tool instead.
+3. Tell the user: restart Premiere Pro and Claude, open **Window > UXP Plugins > Mec Tracker > Help** and tick **Allow Claude to control the panel**. Then call `mectracker_status` to check.
+
+</details>
 
 ## Requirements and limits
 

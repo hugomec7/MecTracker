@@ -1,0 +1,19 @@
+{
+  "name": "mectracker-mcp",
+  "version": "3.4.0",
+  "description": "MCP server that lets Claude drive the Mec Tracker panel in Premiere Pro.",
+  "main": "server.js",
+  "bin": {
+    "mectracker-mcp": "server.js"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "pack": "npx -y @anthropic-ai/mcpb pack . ../dist/MecTracker.mcpb && npm pack --pack-destination ../dist && mv ../dist/mectracker-mcp-$npm_package_version.tgz ../dist/mectracker-mcp.tgz"
+  },
+  "files": [
+    "server.js"
+  ]
+}

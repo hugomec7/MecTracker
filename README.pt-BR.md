@@ -4,6 +4,7 @@
 
 <p align="center">
   <a href="../../releases/latest">Baixar</a> ·
+  <a href="#usar-com-o-claude-mcp">Instalar com o Claude</a> ·
   <a href="#tutoriais">Tutoriais em vídeo</a> ·
   <a href="docs/guides/MecTracker-Guide_pt-br.pdf">Guia de uso (PDF)</a> ·
   <a href="README.md">🌎 Read in English</a>
@@ -24,6 +25,7 @@ O Mec Tracker é um painel gratuito e de código aberto para o **Adobe Premiere 
 - **Colar Direto no Clipe de Cima**: rastreia e cola no clipe da trilha de cima com um clique.
 - **Vários clipes de uma vez**: rastreie várias máscaras e depois cole cada rastreio nos alvos que você escolher.
 - **Painel que guia**: o botão azul é sempre o próximo passo, e os botões mostram quantos clipes estão selecionados.
+- **Controle pelo Claude (MCP)**: o Claude Desktop ou o Claude Code rastreia e cola para você por comandos, sem clicar. Veja [Usar com o Claude](#usar-com-o-claude-mcp).
 - **Aviso de atualização**: o painel avisa quando sair uma versão nova aqui no GitHub.
 - Interface em português e inglês.
 
@@ -107,6 +109,44 @@ Para instalar uma versão nova, é só rodar o instalador de novo. Ele substitui
 ![Aviso de atualização](docs/images/pt/5-update.png)
 
 Quando sair uma release nova aqui, o painel mostra o número da versão nova, um botão **Ver novidades** com as notas da versão e um link **Baixar**. Ele confere o GitHub a cada 30 minutos com o painel aberto. Para conferir na hora, clique em **Verificar atualizações** no fim da aba Ajuda.
+
+## Usar com o Claude (MCP)
+
+![Controle pelo Claude na aba Ajuda](docs/images/pt/claude.png)
+
+O Claude (Desktop ou Code) pode usar o Mec Tracker por você com comandos curtos, sem tirar print nem clicar na tela. É muito mais rápido e gasta muito menos tokens do que o controle do computador.
+
+1. **Instale tudo com o Claude**: no **Claude Code** (ou na aba **Code** do Claude Desktop), cole:
+   ```text
+   Instale o Mec Tracker para mim: https://github.com/hugomec7/MecTracker
+   ```
+   O Claude instala o conector e o plugin do Premiere sozinho. Aceite o pedido de administrador (Windows) ou digite sua senha (Mac) quando aparecer.
+   - Claude Code, à mão: `/plugin install mectracker --marketplace hugomec7/MecTracker`
+   - Chat do Claude Desktop (sem a aba Code): dê dois cliques no [`MecTracker.mcpb`](dist/MecTracker.mcpb) (ele também vem na pasta `Claude` do zip da release) e peça ao Claude: *"Instale o plugin do Mec Tracker no Premiere"*.
+2. **Ligue no painel**: no Premiere abra o Mec Tracker, vá em **Ajuda** e marque **Permitir controle pelo Claude**. Uma bolinha verde **Claude** aparece no topo quando ele conecta.
+3. **Peça ao Claude**, por exemplo: *"Rastreie o clipe selecionado e cole no texto de cima"* ou *"Rastreie os 3 clipes da V1 e cole nos títulos da V2, um keyframe a cada 2 frames"*.
+
+A máscara você ainda cria e rastreia no Premiere; o Claude faz o resto. Tudo fica no seu computador (`127.0.0.1`, porta 47321). Detalhes e a lista de comandos: [`mcp/README.pt-BR.md`](mcp/README.pt-BR.md).
+
+<details>
+<summary><b>Para assistentes de IA: passos da instalação</b></summary>
+
+Quando o usuário pedir para instalar o Mec Tracker a partir desta página, rode no computador dele, nesta ordem:
+
+1. Plugin do Claude (servidor MCP + skill):
+   ```bash
+   claude plugin marketplace add hugomec7/MecTracker
+   claude plugin install mectracker@mectracker
+   ```
+   Sem o comando `claude` (por exemplo, no chat normal do Claude Desktop)? Peça para o usuário dar dois cliques no [`dist/MecTracker.mcpb`](dist/MecTracker.mcpb).
+2. Plugin do Premiere (baixa a release mais nova e roda o instalador; no Windows aparece um pedido de administrador e no Mac uma janela pedindo a senha, então avise o usuário):
+   ```bash
+   npx -y https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz --install-premiere-plugin
+   ```
+   Precisa do Node.js 18+. Sem Node, depois do passo 1 e de reiniciar o Claude, use a ferramenta `mectracker_install_plugin`.
+3. Diga ao usuário: reinicie o Premiere Pro e o Claude, abra **Janela > Plug-ins UXP > Mec Tracker > Ajuda** e marque **Permitir controle pelo Claude**. Depois chame `mectracker_status` para conferir.
+
+</details>
 
 ## Requisitos e limites
 
