@@ -1,0 +1,9 @@
+01-open-the-panel.mp4|01 - Abrir o painel (Open the panel).mp4
+02-mask-by-hand.mp4|02 - Mascara manual (Mask by hand).mp4
+03-object-mask.mp4|03 - Mascara automatica com Object Mask (Object Mask).mp4
+04-track-and-paste.mp4|04 - Rastrear e Colar (Track and Paste).mp4
+05-paste-straight.mp4|05 - Colar Direto no Clipe de Cima (Paste Straight).mp4
+06-mask-nest-paste-straight.mp4|06 - Mascara, Nest e Colar Direto (Mask, Nest, Paste Straight).mp4
+07-several-clips-track-paste.mp4|07 - Varios clipes, Rastrear e Colar (Several clips, Track and Paste).mp4
+08-several-clips-paste-straight.mp4|08 - Varios clipes, Colar Direto (Several clips, Paste Straight).mp4
+09-stabilize.mp4|09 - Estabilizar (Stabilize).mp4

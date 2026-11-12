@@ -1,0 +1,53 @@
+# Publica a release sozinha: quando a versão do manifest.json muda no main (ou à mão, em Actions),
+# monta o MecTracker_<versão>.zip e cria a release v<versão> com as notas do CHANGELOG.md.
+# Se a release da versão já existe, não faz nada.
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - com.mectracker/manifest.json
+      - .github/workflows/release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Version
+        id: v
+        run: echo "version=$(node -p "require('./com.mectracker/manifest.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Skip if already released
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "v${{ steps.v.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"; echo "v${{ steps.v.outputs.version }} already released."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build zip
+        if: steps.check.outputs.exists == 'false'
+        run: tools/release/build-zip.sh dist-release
+      - name: Notes from CHANGELOG
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          awk -v v="## ${{ steps.v.outputs.version }}" '$0==v{f=1;next} /^## /{f=0} f' CHANGELOG.md > notes.md
+          echo "- Requires Adobe Premiere Pro 2026 (version 26.0) or later." >> notes.md
+          cat notes.md
+      - name: Publish release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.v.outputs.version }}" "dist-release/MecTracker_${{ steps.v.outputs.version }}.zip" \
+            --title "Mec Tracker ${{ steps.v.outputs.version }}" --notes-file notes.md --target "${{ github.sha }}" --latest

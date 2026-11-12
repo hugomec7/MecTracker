@@ -1,0 +1,11 @@
+Mec Tracker + Claude (MCP)  ·  English below
+
+1. Claude Desktop: dê dois cliques em MecTracker.mcpb (ou arraste para Configurações > Extensões).
+   Claude Code: claude mcp add mectracker -- node "<esta pasta>/server.js"
+2. No Premiere, abra o Mec Tracker > Ajuda > marque "Permitir controle pelo Claude".
+3. Peça ao Claude, por exemplo: "Rastreie o clipe selecionado e cole no texto de cima".
+
+1. Claude Desktop: double-click MecTracker.mcpb (or drag it into Settings > Extensions).
+   Claude Code: claude mcp add mectracker -- node "<this folder>/server.js"
+2. In Premiere, open Mec Tracker > Help > tick "Allow Claude to control the panel".
+3. Ask Claude, e.g.: "Track the selected clip and paste it onto the text above".
