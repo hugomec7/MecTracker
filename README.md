@@ -115,9 +115,19 @@ When a new release is published here, the panel shows the new version number, a 
 
 Claude (Desktop or Code) can run Mec Tracker for you through short commands, without screenshots or clicks on the screen. That is much faster and uses far fewer tokens than computer use.
 
-1. **Install the connector**
-   - **Claude Desktop**: download [`MecTracker.mcpb`](dist/MecTracker.mcpb) (it also comes in the `Claude` folder of the release zip) and double-click it, or drag it into **Settings > Extensions**.
-   - **Claude Code**: run `claude mcp add mectracker -- node "/path/to/Claude/server.js"` (the same `server.js` is in [`mcp/`](mcp)). Node 18 or newer.
+1. **Install the connector**, one of these:
+   - **Copy and paste into Claude** (Claude Code, or the Code tab of Claude Desktop) and it installs itself. Needs [Node.js](https://nodejs.org) 18+.
+     ```text
+     Install the Mec Tracker MCP connector (Premiere Pro plugin) on this computer:
+     1. Check that Node.js 18 or newer is installed (node -v). If it is not, ask me to install it from nodejs.org and stop.
+     2. Claude Code: run  claude mcp add mectracker -s user -- npx -y https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz
+        (on Windows use "cmd /c npx" instead of "npx").
+     3. Claude Desktop: in claude_desktop_config.json (Mac: ~/Library/Application Support/Claude/, Windows: %APPDATA%\Claude\), create it if missing and add to "mcpServers" an entry "mectracker" with "command": "npx" and "args": ["-y", "https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz"] (on Windows: "command": "cmd", "args": ["/c", "npx", "-y", "https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz"]). Keep everything already in the file.
+     4. When done, tell me to restart Claude and, in Premiere, tick Mec Tracker > Help > Allow Claude to control the panel.
+     Instructions: https://github.com/hugomec7/MecTracker/tree/main/mcp
+     ```
+   - **Claude Desktop, no Node needed**: download [`MecTracker.mcpb`](dist/MecTracker.mcpb) (also in the `Claude` folder of the release zip) and double-click it, or drag it into **Settings > Extensions**.
+   - **Claude Code, one line**: `claude mcp add mectracker -s user -- npx -y https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz`
 2. **Turn it on in the panel**: in Premiere open Mec Tracker, go to **Help** and tick **Allow Claude to control the panel**. A green **Claude** dot shows at the top when it is connected.
 3. **Ask Claude**, for example: *"Track the selected clip and paste it onto the text above it"* or *"Track the 3 clips on V1, then paste onto the titles on V2, stabilize off, one keyframe every 2 frames"*.
 

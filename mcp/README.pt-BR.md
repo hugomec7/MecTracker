@@ -10,17 +10,41 @@ Painéis UXP não podem abrir uma porta, então é o painel que se conecta a est
 
 ## Instalar
 
-**Claude Desktop**: dê dois cliques no [`../dist/MecTracker.mcpb`](../dist/MecTracker.mcpb) (ele também vem na pasta `Claude` do zip da release), ou arraste para **Configurações > Extensões**.
+**Copie e cole no Claude** (Claude Code, ou a aba Code do Claude Desktop). Ele instala sozinho. Precisa do [Node.js](https://nodejs.org) 18+:
+
+```text
+Instale o conector MCP do Mec Tracker (plugin do Premiere Pro) neste computador:
+1. Confira se o Node.js 18 ou mais novo está instalado (node -v). Se não estiver, me peça para instalar pelo nodejs.org e pare aqui.
+2. Claude Code: rode  claude mcp add mectracker -s user -- npx -y https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz
+   (no Windows use "cmd /c npx" no lugar de "npx").
+3. Claude Desktop: no arquivo claude_desktop_config.json (Mac: ~/Library/Application Support/Claude/, Windows: %APPDATA%\Claude\), crie se não existir e acrescente em "mcpServers" a entrada "mectracker" com "command": "npx" e "args": ["-y", "https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz"] (no Windows: "command": "cmd", "args": ["/c", "npx", "-y", "https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz"]). Não apague o que já existe no arquivo.
+4. No fim, me diga para reiniciar o Claude e, no Premiere, marcar Mec Tracker > Ajuda > Permitir controle pelo Claude.
+Instruções: https://github.com/hugomec7/MecTracker/tree/main/mcp
+```
+
+**Claude Desktop, sem precisar de Node**: dê dois cliques no [`../dist/MecTracker.mcpb`](../dist/MecTracker.mcpb) (ele também vem na pasta `Claude` do zip da release), ou arraste para **Configurações > Extensões**.
 
 **Claude Code**:
 
 ```bash
-claude mcp add mectracker -- node "/caminho/para/server.js"
+claude mcp add mectracker -s user -- npx -y https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz
 ```
+
+**Claude Desktop à mão** (Configurações > Desenvolvedor > Editar configuração):
+
+```json
+{
+  "mcpServers": {
+    "mectracker": { "command": "npx", "args": ["-y", "https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz"] }
+  }
+}
+```
+
+No Windows use `"command": "cmd", "args": ["/c", "npx", "-y", "..."]`.
 
 Depois, no Premiere: **Mec Tracker > Ajuda > Permitir controle pelo Claude**. O painel tenta de novo a cada poucos segundos, então a ordem não importa. Uma bolinha verde **Claude** aparece no topo do painel quando ele está conectado.
 
-## Comandos
+
 
 | Ferramenta | O que faz |
 |---|---|

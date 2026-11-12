@@ -10,17 +10,41 @@ UXP panels cannot open a port, so the panel connects to this server as a client.
 
 ## Install
 
-**Claude Desktop**: double-click [`../dist/MecTracker.mcpb`](../dist/MecTracker.mcpb) (also in the `Claude` folder of the release zip), or drag it into **Settings > Extensions**.
+**Copy and paste into Claude** (Claude Code, or the Code tab of Claude Desktop). It installs itself. Needs [Node.js](https://nodejs.org) 18+:
+
+```text
+Install the Mec Tracker MCP connector (Premiere Pro plugin) on this computer:
+1. Check that Node.js 18 or newer is installed (node -v). If it is not, ask me to install it from nodejs.org and stop.
+2. Claude Code: run  claude mcp add mectracker -s user -- npx -y https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz
+   (on Windows use "cmd /c npx" instead of "npx").
+3. Claude Desktop: in claude_desktop_config.json (Mac: ~/Library/Application Support/Claude/, Windows: %APPDATA%\Claude\), create it if missing and add to "mcpServers" an entry "mectracker" with "command": "npx" and "args": ["-y", "https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz"] (on Windows: "command": "cmd", "args": ["/c", "npx", "-y", "https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz"]). Keep everything already in the file.
+4. When done, tell me to restart Claude and, in Premiere, tick Mec Tracker > Help > Allow Claude to control the panel.
+Instructions: https://github.com/hugomec7/MecTracker/tree/main/mcp
+```
+
+**Claude Desktop, no Node needed**: double-click [`../dist/MecTracker.mcpb`](../dist/MecTracker.mcpb) (also in the `Claude` folder of the release zip), or drag it into **Settings > Extensions**.
 
 **Claude Code**:
 
 ```bash
-claude mcp add mectracker -- node "/path/to/server.js"
+claude mcp add mectracker -s user -- npx -y https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz
 ```
+
+**Claude Desktop by hand** (Settings > Developer > Edit Config):
+
+```json
+{
+  "mcpServers": {
+    "mectracker": { "command": "npx", "args": ["-y", "https://raw.githubusercontent.com/hugomec7/MecTracker/main/dist/mectracker-mcp.tgz"] }
+  }
+}
+```
+
+On Windows use `"command": "cmd", "args": ["/c", "npx", "-y", "..."]`.
 
 Then in Premiere: **Mec Tracker > Help > Allow Claude to control the panel**. The panel retries every few seconds, so the order does not matter. A green **Claude** dot shows at the top of the panel while it is connected.
 
-## Tools
+
 
 | Tool | What it does |
 |---|---|
@@ -45,10 +69,10 @@ The mask itself is still made and tracked in Premiere (Effect Controls); Mec Tra
 - Only one Claude window can hold the port. A second one waits and takes over when the first closes.
 - The panel only connects while **Allow Claude to control the panel** is ticked (off by default).
 
-## Build the .mcpb
+## Build the .mcpb and the npx package
 
 ```bash
-cd mcp && npx -y @anthropic-ai/mcpb pack . ../dist/MecTracker.mcpb
+cd mcp && npm run pack   # builds dist/MecTracker.mcpb and dist/mectracker-mcp.tgz
 ```
 
 Keep `version` in `manifest.json`, `package.json` and `VERSION` in `server.js` the same as the plugin.

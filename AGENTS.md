@@ -18,7 +18,7 @@ The mask must already exist and be tracked by Premiere (Effect Controls, or an O
 ## Repository layout
 
 - `com.mectracker/` the UXP plugin (manifest v5, Premiere Pro 26+). No build step. `index.js` is one file with small modules (`__defs[...]`): `png`, `measure`, `solver`, `prproj`, `host` (all Premiere API calls), `app` (UI, texts in `DICT.pt` / `DICT.en`, and the "controle pelo Claude" bridge).
-- `mcp/` the MCP server (`server.js`, Node 18+, zero dependencies) and the `.mcpb` manifest. `dist/MecTracker.mcpb` is the packed connector.
+- `mcp/` the MCP server (`server.js`, Node 18+, zero dependencies) and the `.mcpb` manifest. `dist/MecTracker.mcpb` is the packed connector for Claude Desktop; `dist/mectracker-mcp.tgz` is the same server for `npx` (used by the copy-paste install).
 - `tools/guide/` renders the panel with a fake Premiere (`panel-mock.html`) and builds the PDF guides. Keep its HTML in sync with `com.mectracker/index.html`.
 - `tools/mcp-test/` end-to-end test of the MCP server + panel bridge with a fake Premiere (`node tools/mcp-test/e2e.js`, needs Playwright).
 - `docs/` guides (PDF), README images and tutorial videos.
@@ -39,6 +39,6 @@ Bump the version in all of these, then tag `vX.Y.Z` (the panel's update notice r
 - `VERSION` in `com.mectracker/index.js`
 - `plugin-ver` at the end of the Help tab in `com.mectracker/index.html` (and `tools/guide/panel-mock.html`)
 - `versionString` in `Install-Windows.bat` and `Install-Mac.command`
-- `mcp/manifest.json`, `mcp/package.json` and `VERSION` in `mcp/server.js`, then repack: `cd mcp && npx -y @anthropic-ai/mcpb pack . ../dist/MecTracker.mcpb`
+- `mcp/manifest.json`, `mcp/package.json` and `VERSION` in `mcp/server.js`, then repack: `cd mcp && npm run pack` (rebuilds `dist/MecTracker.mcpb` and `dist/mectracker-mcp.tgz`; the copy-paste install in the README downloads that `.tgz` from `main`)
 
 Release zip `MecTracker_X.Y.Z.zip` holds a `MecTracker-Installer/` folder with `com.mectracker/` (no version in the folder name), both installers, `MecTracker.ccx` (zip of the plugin folder's contents), the PT/EN guide PDFs, `Tutoriais/` and `Claude/` (`MecTracker.mcpb` + `server.js`).
